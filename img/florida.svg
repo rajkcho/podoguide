@@ -1,0 +1,4 @@
+<!-- Simplified Florida outline inspired by U.S. Census TIGER/Line public-domain data -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 640">
+  <path d="M36 168 L38 146 L62 132 L142 122 L210 100 L250 106 L306 124 L340 150 L360 188 L356 220 L378 254 L392 300 L388 332 L402 360 L398 388 L410 420 L398 450 L390 486 L370 528 L352 562 L336 580 L312 590 L290 584 L268 556 L246 512 L226 468 L200 420 L178 378 L152 330 L128 284 L104 238 L84 210 L60 188 Z" fill="#f3f4f6" stroke="#cbd5e1" stroke-width="2" stroke-linejoin="round"/>
+</svg>

@@ -1,11 +1,5 @@
 [
   {
-    "name": "1962 North John Young Pkwy",
-    "slug": "1962-north-john-young-pkwy",
-    "href": "/podoguide/podiatrists/fl/1962-north-john-young-pkwy/",
-    "count": 1
-  },
-  {
     "name": "Alachua",
     "slug": "alachua",
     "href": "/podoguide/podiatrists/fl/alachua/",
@@ -16,18 +10,6 @@
     "slug": "alford",
     "href": "/podoguide/podiatrists/fl/alford/",
     "count": 15
-  },
-  {
-    "name": "Altamonte Spg",
-    "slug": "altamonte-spg",
-    "href": "/podoguide/podiatrists/fl/altamonte-spg/",
-    "count": 5
-  },
-  {
-    "name": "Altamonte Spring",
-    "slug": "altamonte-spring",
-    "href": "/podoguide/podiatrists/fl/altamonte-spring/",
-    "count": 1
   },
   {
     "name": "Altamonte Springs",
@@ -124,12 +106,6 @@
     "slug": "auburndale",
     "href": "/podoguide/podiatrists/fl/auburndale/",
     "count": 27
-  },
-  {
-    "name": "Ave Maria",
-    "slug": "ave-maria",
-    "href": "/podoguide/podiatrists/fl/ave-maria/",
-    "count": 8
   },
   {
     "name": "Aventura",
@@ -294,18 +270,6 @@
     "count": 13
   },
   {
-    "name": "Bonita Spgs",
-    "slug": "bonita-spgs",
-    "href": "/podoguide/podiatrists/fl/bonita-spgs/",
-    "count": 2
-  },
-  {
-    "name": "Bonita Spring",
-    "slug": "bonita-spring",
-    "href": "/podoguide/podiatrists/fl/bonita-spring/",
-    "count": 2
-  },
-  {
     "name": "Bonita Springs",
     "slug": "bonita-springs",
     "href": "/podoguide/podiatrists/fl/bonita-springs/",
@@ -430,12 +394,6 @@
     "slug": "cape-coral",
     "href": "/podoguide/podiatrists/fl/cape-coral/",
     "count": 434
-  },
-  {
-    "name": "Cape Coral 33991",
-    "slug": "cape-coral-33991",
-    "href": "/podoguide/podiatrists/fl/cape-coral-33991/",
-    "count": 1
   },
   {
     "name": "Carol City",
@@ -738,12 +696,6 @@
     "count": 531
   },
   {
-    "name": "Deerfield Beach Ste 102",
-    "slug": "deerfield-beach-ste-102",
-    "href": "/podoguide/podiatrists/fl/deerfield-beach-ste-102/",
-    "count": 1
-  },
-  {
     "name": "Defuniak Springs",
     "slug": "defuniak-springs",
     "href": "/podoguide/podiatrists/fl/defuniak-springs/",
@@ -1002,6 +954,12 @@
     "count": 219
   },
   {
+    "name": "Fort Walton Bch",
+    "slug": "ft-walton-bch",
+    "href": "/podoguide/podiatrists/fl/ft-walton-bch/",
+    "count": 1
+  },
+  {
     "name": "Fort Walton Beach",
     "slug": "fort-walton-beach",
     "href": "/podoguide/podiatrists/fl/fort-walton-beach/",
@@ -1050,36 +1008,6 @@
     "count": 1
   },
   {
-    "name": "Ft Lauderdale",
-    "slug": "ft-lauderdale",
-    "href": "/podoguide/podiatrists/fl/ft-lauderdale/",
-    "count": 154
-  },
-  {
-    "name": "Ft Myers",
-    "slug": "ft-myers",
-    "href": "/podoguide/podiatrists/fl/ft-myers/",
-    "count": 1
-  },
-  {
-    "name": "Ft Pierce",
-    "slug": "ft-pierce",
-    "href": "/podoguide/podiatrists/fl/ft-pierce/",
-    "count": 1
-  },
-  {
-    "name": "Ft Walton Bch",
-    "slug": "ft-walton-bch",
-    "href": "/podoguide/podiatrists/fl/ft-walton-bch/",
-    "count": 1
-  },
-  {
-    "name": "Ft Walton Beach",
-    "slug": "ft-walton-beach",
-    "href": "/podoguide/podiatrists/fl/ft-walton-beach/",
-    "count": 1
-  },
-  {
     "name": "Gainesvile",
     "slug": "gainesvile",
     "href": "/podoguide/podiatrists/fl/gainesvile/",
@@ -1104,7 +1032,7 @@
     "count": 5
   },
   {
-    "name": "Glen Saint Mary",
+    "name": "Glen St. Mary",
     "slug": "glen-saint-mary",
     "href": "/podoguide/podiatrists/fl/glen-saint-mary/",
     "count": 3
@@ -1491,12 +1419,6 @@
     "name": "Kendall",
     "slug": "kendall",
     "href": "/podoguide/podiatrists/fl/kendall/",
-    "count": 2
-  },
-  {
-    "name": "Kennedy Space Center",
-    "slug": "kennedy-space-center",
-    "href": "/podoguide/podiatrists/fl/kennedy-space-center/",
     "count": 2
   },
   {
@@ -1902,7 +1824,7 @@
     "count": 1
   },
   {
-    "name": "Mcintosh",
+    "name": "McIntosh",
     "slug": "mcintosh",
     "href": "/podoguide/podiatrists/fl/mcintosh/",
     "count": 1
@@ -2103,12 +2025,6 @@
     "name": "N Fort Myers",
     "slug": "n-fort-myers",
     "href": "/podoguide/podiatrists/fl/n-fort-myers/",
-    "count": 3
-  },
-  {
-    "name": "N Ft Myers",
-    "slug": "n-ft-myers",
-    "href": "/podoguide/podiatrists/fl/n-ft-myers/",
     "count": 3
   },
   {
@@ -2568,12 +2484,6 @@
     "count": 34
   },
   {
-    "name": "Petersburg",
-    "slug": "petersburg",
-    "href": "/podoguide/podiatrists/fl/petersburg/",
-    "count": 1
-  },
-  {
     "name": "Pierson",
     "slug": "pierson",
     "href": "/podoguide/podiatrists/fl/pierson/",
@@ -2682,43 +2592,25 @@
     "count": 60
   },
   {
-    "name": "Port Saint Joe",
-    "slug": "port-saint-joe",
-    "href": "/podoguide/podiatrists/fl/port-saint-joe/",
-    "count": 1
-  },
-  {
-    "name": "Port Saint John",
-    "slug": "port-saint-john",
-    "href": "/podoguide/podiatrists/fl/port-saint-john/",
-    "count": 1
-  },
-  {
-    "name": "Port Saint Lucie",
-    "slug": "port-saint-lucie",
-    "href": "/podoguide/podiatrists/fl/port-saint-lucie/",
-    "count": 186
-  },
-  {
-    "name": "Port St Joe",
+    "name": "Port St. Joe",
     "slug": "port-st-joe",
     "href": "/podoguide/podiatrists/fl/port-st-joe/",
     "count": 12
   },
   {
-    "name": "Port St John",
+    "name": "Port St. John",
     "slug": "port-st-john",
     "href": "/podoguide/podiatrists/fl/port-st-john/",
     "count": 7
   },
   {
-    "name": "Port St Lucie",
+    "name": "Port St. Lucie",
     "slug": "port-st-lucie",
     "href": "/podoguide/podiatrists/fl/port-st-lucie/",
     "count": 291
   },
   {
-    "name": "Port St Lucy",
+    "name": "Port St. Lucy",
     "slug": "port-st-lucy",
     "href": "/podoguide/podiatrists/fl/port-st-lucy/",
     "count": 1
@@ -2728,18 +2620,6 @@
     "slug": "princeton",
     "href": "/podoguide/podiatrists/fl/princeton/",
     "count": 2
-  },
-  {
-    "name": "Pt Charlotte",
-    "slug": "pt-charlotte",
-    "href": "/podoguide/podiatrists/fl/pt-charlotte/",
-    "count": 1
-  },
-  {
-    "name": "Pt Orange",
-    "slug": "pt-orange",
-    "href": "/podoguide/podiatrists/fl/pt-orange/",
-    "count": 1
   },
   {
     "name": "Punta Gorda",
@@ -2824,30 +2704,6 @@
     "slug": "safety-harbor",
     "href": "/podoguide/podiatrists/fl/safety-harbor/",
     "count": 53
-  },
-  {
-    "name": "Saint Augustine",
-    "slug": "saint-augustine",
-    "href": "/podoguide/podiatrists/fl/saint-augustine/",
-    "count": 104
-  },
-  {
-    "name": "Saint Cloud",
-    "slug": "saint-cloud",
-    "href": "/podoguide/podiatrists/fl/saint-cloud/",
-    "count": 84
-  },
-  {
-    "name": "Saint Johns",
-    "slug": "saint-johns",
-    "href": "/podoguide/podiatrists/fl/saint-johns/",
-    "count": 66
-  },
-  {
-    "name": "Saint Petersburg",
-    "slug": "saint-petersburg",
-    "href": "/podoguide/podiatrists/fl/saint-petersburg/",
-    "count": 156
   },
   {
     "name": "Salt Springs",
@@ -3018,82 +2874,70 @@
     "count": 1
   },
   {
-    "name": "St Augusine",
+    "name": "St. Augusine",
     "slug": "st-augusine",
     "href": "/podoguide/podiatrists/fl/st-augusine/",
     "count": 1
   },
   {
-    "name": "St Augustine",
+    "name": "St. Augustine",
     "slug": "st-augustine",
     "href": "/podoguide/podiatrists/fl/st-augustine/",
     "count": 477
   },
   {
-    "name": "St Augustine Beach",
+    "name": "St. Augustine Beach",
     "slug": "st-augustine-beach",
     "href": "/podoguide/podiatrists/fl/st-augustine-beach/",
     "count": 1
   },
   {
-    "name": "St Cloud",
+    "name": "St. Cloud",
     "slug": "st-cloud",
     "href": "/podoguide/podiatrists/fl/st-cloud/",
     "count": 3
   },
   {
-    "name": "St James City",
+    "name": "St. James City",
     "slug": "st-james-city",
     "href": "/podoguide/podiatrists/fl/st-james-city/",
     "count": 2
   },
   {
-    "name": "St Johns",
+    "name": "St. Johns",
     "slug": "st-johns",
     "href": "/podoguide/podiatrists/fl/st-johns/",
     "count": 78
   },
   {
-    "name": "St Lucie West",
+    "name": "St. Lucie West",
     "slug": "st-lucie-west",
     "href": "/podoguide/podiatrists/fl/st-lucie-west/",
     "count": 1
   },
   {
-    "name": "St Pete",
+    "name": "St. Pete",
     "slug": "st-pete",
     "href": "/podoguide/podiatrists/fl/st-pete/",
     "count": 1
   },
   {
-    "name": "St Pete Beach",
+    "name": "St. Pete Beach",
     "slug": "st-pete-beach",
     "href": "/podoguide/podiatrists/fl/st-pete-beach/",
     "count": 19
   },
   {
-    "name": "St Petersburg",
+    "name": "St. Petersburg",
     "slug": "st-petersburg",
     "href": "/podoguide/podiatrists/fl/st-petersburg/",
     "count": 943
-  },
-  {
-    "name": "St Petersburgh",
-    "slug": "st-petersburgh",
-    "href": "/podoguide/podiatrists/fl/st-petersburgh/",
-    "count": 2
   },
   {
     "name": "Starke",
     "slug": "starke",
     "href": "/podoguide/podiatrists/fl/starke/",
     "count": 34
-  },
-  {
-    "name": "Stpetersburg",
-    "slug": "stpetersburg",
-    "href": "/podoguide/podiatrists/fl/stpetersburg/",
-    "count": 1
   },
   {
     "name": "Stuart",
@@ -3124,12 +2968,6 @@
     "slug": "sumterville",
     "href": "/podoguide/podiatrists/fl/sumterville/",
     "count": 9
-  },
-  {
-    "name": "Sun City Center",
-    "slug": "sun-city-center",
-    "href": "/podoguide/podiatrists/fl/sun-city-center/",
-    "count": 139
   },
   {
     "name": "Sunny Isles Beach",
@@ -3318,13 +3156,13 @@
     "count": 35
   },
   {
-    "name": "Village Of Palmetto Bay",
+    "name": "Village of Palmetto Bay",
     "slug": "village-of-palmetto-bay",
     "href": "/podoguide/podiatrists/fl/village-of-palmetto-bay/",
     "count": 2
   },
   {
-    "name": "Village Of Wellington",
+    "name": "Village of Wellington",
     "slug": "village-of-wellington",
     "href": "/podoguide/podiatrists/fl/village-of-wellington/",
     "count": 1
