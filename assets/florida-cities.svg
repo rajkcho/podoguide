@@ -2,35 +2,44 @@
 <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink="http://www.w3.org/1999/xlink" viewBox='0 0 420 640'>
   <path class='state' d='M36 168 L38 146 L62 132 L142 122 L210 100 L250 106 L306 124 L340 150 L360 188 L356 220 L378 254 L392 300 L388 332 L402 360 L398 388 L410 420 L398 450 L390 486 L370 528 L352 562 L336 580 L312 590 L290 584 L268 556 L246 512 L226 468 L200 420 L178 378 L152 330 L128 284 L104 238 L84 210 L60 188 Z'/>
   <text x='210' y='330'>Florida</text>
-  <a xlink:href="/podoguide/podiatrists/fl/miami/" aria-label="Miami, FL"><circle class='city' cx='308' cy='520' r='4'><title>Miami</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/orlando/" aria-label="Orlando, FL"><circle class='city' cx='225' cy='330' r='4'><title>Orlando</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/tampa/" aria-label="Tampa, FL"><circle class='city' cx='175' cy='370' r='4'><title>Tampa</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/jacksonville/" aria-label="Jacksonville, FL"><circle class='city' cx='255' cy='210' r='4'><title>Jacksonville</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/st-petersburg/" aria-label="St. Petersburg, FL"><circle class='city' cx='168' cy='385' r='4'><title>St. Petersburg</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/hialeah/" aria-label="Hialeah, FL"><circle class='city' cx='305' cy='508' r='4'><title>Hialeah</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/fort-lauderdale/" aria-label="Fort Lauderdale, FL"><circle class='city' cx='302' cy='488' r='4'><title>Fort Lauderdale</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/tallahassee/" aria-label="Tallahassee, FL"><circle class='city' cx='150' cy='205' r='4'><title>Tallahassee</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/port-st-lucie/" aria-label="Port St. Lucie, FL"><circle class='city' cx='290' cy='445' r='4'><title>Port St. Lucie</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/cape-coral/" aria-label="Cape Coral, FL"><circle class='city' cx='215' cy='430' r='4'><title>Cape Coral</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/pembroke-pines/" aria-label="Pembroke Pines, FL"><circle class='city' cx='295' cy='498' r='4'><title>Pembroke Pines</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/hollywood/" aria-label="Hollywood, FL"><circle class='city' cx='300' cy='482' r='4'><title>Hollywood</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/gainesville/" aria-label="Gainesville, FL"><circle class='city' cx='215' cy='265' r='4'><title>Gainesville</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/miramar/" aria-label="Miramar, FL"><circle class='city' cx='292' cy='502' r='4'><title>Miramar</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/coral-springs/" aria-label="Coral Springs, FL"><circle class='city' cx='285' cy='470' r='4'><title>Coral Springs</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/clearwater/" aria-label="Clearwater, FL"><circle class='city' cx='170' cy='365' r='4'><title>Clearwater</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/palm-bay/" aria-label="Palm Bay, FL"><circle class='city' cx='275' cy='405' r='4'><title>Palm Bay</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/west-palm-beach/" aria-label="West Palm Beach, FL"><circle class='city' cx='286' cy='452' r='4'><title>West Palm Beach</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/pompano-beach/" aria-label="Pompano Beach, FL"><circle class='city' cx='288' cy='478' r='4'><title>Pompano Beach</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/lakeland/" aria-label="Lakeland, FL"><circle class='city' cx='205' cy='345' r='4'><title>Lakeland</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/davie/" aria-label="Davie, FL"><circle class='city' cx='294' cy='492' r='4'><title>Davie</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/miami-gardens/" aria-label="Miami Gardens, FL"><circle class='city' cx='300' cy='500' r='4'><title>Miami Gardens</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/deltona/" aria-label="Deltona, FL"><circle class='city' cx='235' cy='315' r='4'><title>Deltona</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/boca-raton/" aria-label="Boca Raton, FL"><circle class='city' cx='285' cy='462' r='4'><title>Boca Raton</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/palm-coast/" aria-label="Palm Coast, FL"><circle class='city' cx='250' cy='270' r='4'><title>Palm Coast</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/sarasota/" aria-label="Sarasota, FL"><circle class='city' cx='190' cy='395' r='4'><title>Sarasota</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/ocala/" aria-label="Ocala, FL"><circle class='city' cx='215' cy='285' r='4'><title>Ocala</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/pensacola/" aria-label="Pensacola, FL"><circle class='city' cx='110' cy='180' r='4'><title>Pensacola</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/kissimmee/" aria-label="Kissimmee, FL"><circle class='city' cx='228' cy='338' r='4'><title>Kissimmee</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/naples/" aria-label="Naples, FL"><circle class='city' cx='255' cy='470' r='4'><title>Naples</title></circle></a>
-  <a xlink:href="/podoguide/podiatrists/fl/bradenton/" aria-label="Bradenton, FL"><circle class='city' cx='185' cy='380' r='4'><title>Bradenton</title></circle></a>
+  <g>
+    <a xlink:href="/podoguide/podiatrists/fl/miami/" aria-label="Miami, FL"><circle class='city' cx='308' cy='520' r='5'><title>Miami — 5,022 podiatrists</title></circle></a>
+    <text class='city-label' x='318' y='512'>Miami</text>
+  </g>
+  <g>
+    <a xlink:href="/podoguide/podiatrists/fl/orlando/" aria-label="Orlando, FL"><circle class='city' cx='225' cy='330' r='5'><title>Orlando — 4,216 podiatrists</title></circle></a>
+    <text class='city-label' x='235' y='322'>Orlando</text>
+  </g>
+  <g>
+    <a xlink:href="/podoguide/podiatrists/fl/jacksonville/" aria-label="Jacksonville, FL"><circle class='city' cx='255' cy='210' r='5'><title>Jacksonville — 4,155 podiatrists</title></circle></a>
+    <text class='city-label' x='265' y='202'>Jacksonville</text>
+  </g>
+  <g>
+    <a xlink:href="/podoguide/podiatrists/fl/tampa/" aria-label="Tampa, FL"><circle class='city' cx='175' cy='370' r='5'><title>Tampa — 3,695 podiatrists</title></circle></a>
+    <text class='city-label' x='185' y='362'>Tampa</text>
+  </g>
+  <g>
+    <a xlink:href="/podoguide/podiatrists/fl/gainesville/" aria-label="Gainesville, FL"><circle class='city' cx='215' cy='265' r='5'><title>Gainesville — 1,695 podiatrists</title></circle></a>
+    <text class='city-label' x='225' y='257'>Gainesville</text>
+  </g>
+  <g>
+    <a xlink:href="/podoguide/podiatrists/fl/fort-myers/" aria-label="Fort Myers, FL"><circle class='city' cx='215' cy='430' r='5'><title>Fort Myers — 1,584 podiatrists</title></circle></a>
+    <text class='city-label' x='225' y='422'>Fort Myers</text>
+  </g>
+  <g>
+    <a xlink:href="/podoguide/podiatrists/fl/melbourne/" aria-label="Melbourne, FL"><circle class='city' cx='275' cy='405' r='5'><title>Melbourne — 1,058 podiatrists</title></circle></a>
+    <text class='city-label' x='285' y='397'>Melbourne</text>
+  </g>
+  <g>
+    <a xlink:href="/podoguide/podiatrists/fl/st-petersburg/" aria-label="St. Petersburg, FL"><circle class='city' cx='168' cy='385' r='5'><title>St. Petersburg — 943 podiatrists</title></circle></a>
+    <text class='city-label' x='178' y='377'>St. Petersburg</text>
+  </g>
+  <g>
+    <a xlink:href="/podoguide/podiatrists/fl/pensacola/" aria-label="Pensacola, FL"><circle class='city' cx='110' cy='180' r='5'><title>Pensacola — 934 podiatrists</title></circle></a>
+    <text class='city-label' x='120' y='172'>Pensacola</text>
+  </g>
+  <g>
+    <a xlink:href="/podoguide/podiatrists/fl/kissimmee/" aria-label="Kissimmee, FL"><circle class='city' cx='228' cy='338' r='5'><title>Kissimmee — 924 podiatrists</title></circle></a>
+    <text class='city-label' x='238' y='330'>Kissimmee</text>
+  </g>
 </svg>
