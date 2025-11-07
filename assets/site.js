@@ -134,31 +134,58 @@ function initNavToggle(){
 }
 
 function initMapTooltip(){
-  const tooltip = document.getElementById('map-tooltip');
-  const map = document.querySelector('.florida-map');
-  if(!tooltip || !map) return;
-  const links = map.querySelectorAll('a[data-city][data-count]');
-  if(!links.length) return;
-  const hide = ()=>{ tooltip.style.opacity = '0'; };
-  const show = (evt, link)=>{
-    const circle = link.querySelector('circle');
-    if(!circle) return;
-    const mapRect = map.getBoundingClientRect();
-    const circleRect = circle.getBoundingClientRect();
-    const x = circleRect.left + circleRect.width/2 - mapRect.left;
-    const y = circleRect.top - mapRect.top;
-    tooltip.textContent = `${link.getAttribute('data-city')} — ${link.getAttribute('data-count')}`;
-    tooltip.style.left = x + 'px';
-    tooltip.style.top = y + 'px';
-    tooltip.style.opacity = '1';
-  };
-  links.forEach(link=>{
-    const enter = evt=>show(evt, link);
-    const leave = hide;
-    link.addEventListener('mouseenter', enter);
-    link.addEventListener('mouseleave', leave);
-    link.addEventListener('focus', enter);
-    link.addEventListener('blur', leave);
+  document.querySelectorAll('.florida-map').forEach(map=>{
+    const tooltip = map.querySelector('.map-tooltip');
+    if(!tooltip) return;
+    const markers = map.querySelectorAll('a[data-city][data-count]');
+    if(!markers.length) return;
+    const hide = ()=>{ tooltip.style.opacity = '0'; };
+    const positionTooltip = (clientX, clientY)=>{
+      const mapRect = map.getBoundingClientRect();
+      let x = clientX - mapRect.left;
+      let y = clientY - mapRect.top - 12;
+      x = Math.max(12, Math.min(mapRect.width - 12, x));
+      y = Math.max(12, Math.min(mapRect.height - 12, y));
+      tooltip.style.left = x + 'px';
+      tooltip.style.top = y + 'px';
+    };
+    const circleCenter = marker=>{
+      const circle = marker.querySelector('circle');
+      if(!circle) return null;
+      const rect = circle.getBoundingClientRect();
+      return {x: rect.left + rect.width/2, y: rect.top};
+    };
+    markers.forEach(marker=>{
+      const show = evt=>{
+        tooltip.textContent = `${marker.getAttribute('data-city')} — ${marker.getAttribute('data-count')}`;
+        tooltip.style.opacity = '1';
+        if(evt){
+          if(evt.touches && evt.touches[0]){
+            positionTooltip(evt.touches[0].clientX, evt.touches[0].clientY);
+            return;
+          }
+          if(typeof evt.clientX === 'number'){
+            positionTooltip(evt.clientX, evt.clientY);
+            return;
+          }
+        }
+        const center = circleCenter(marker);
+        if(center) positionTooltip(center.x, center.y);
+      };
+      const move = evt=>{
+        if(evt.touches && evt.touches[0]){
+          positionTooltip(evt.touches[0].clientX, evt.touches[0].clientY);
+        }else if(typeof evt.clientX === 'number'){
+          positionTooltip(evt.clientX, evt.clientY);
+        }
+      };
+      marker.addEventListener('pointerenter', show);
+      marker.addEventListener('pointermove', move);
+      marker.addEventListener('pointerleave', hide);
+      marker.addEventListener('pointercancel', hide);
+      marker.addEventListener('focus', show);
+      marker.addEventListener('blur', hide);
+    });
   });
 }
 
