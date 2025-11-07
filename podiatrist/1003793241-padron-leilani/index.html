@@ -9,16 +9,22 @@
 <script defer src="/podoguide/assets/site.js"></script>
 </head>
 <body class="podiatrist-page" data-npi="1003793241">
-<header>
-  <div class="container top">
-    <a href="/podoguide/" class="brand" aria-label="PodoGuide Home"><img src="/podoguide/assets/logo.svg" alt="PodoGuide logo"/><span class="sr-only">PodoGuide</span></a>
-    <nav aria-label="Main">
-      <a href="/podoguide/podiatrists/">Podiatrists</a>
-      <a href="/podoguide/conditions/">Conditions</a>
-      <a href="/podoguide/treatments/">Treatments</a>
-      <a href="/podoguide/insights/">Insights</a>
-      <a href="/podoguide/about/">About</a>
-      <a href="/podoguide/contact/">Contact</a>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header" role="banner">
+  <div class="container header-wrap">
+    <a class="brand" href="/podoguide/" aria-label="PodoGuide home">
+      <img class="brand-logo" src="/podoguide/assets/logo.svg" alt="PodoGuide"/>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    <nav id="site-nav" class="site-nav" aria-label="Primary">
+      <ul>
+        <li><a href="/podoguide/podiatrists/">Podiatrists</a></li>
+        <li><a href="/podoguide/conditions/">Conditions</a></li>
+        <li><a href="/podoguide/treatments/">Treatments</a></li>
+        <li><a href="/podoguide/insights/">Insights</a></li>
+        <li><a href="/podoguide/about/">About</a></li>
+        <li><a href="/podoguide/contact/">Contact</a></li>
+      </ul>
     </nav>
   </div>
 </header>
@@ -27,7 +33,7 @@
 
 <h1>Dr. Leilani Padron, nan</h1>
 <div class="meta">NPI: 1003793241 · Podiatrist</div>
-<div class="ad">Ad slot (728×90)</div>
+<div class="ad ad-728x90" role="complementary" aria-label="Advertisement">Reserved ad slot</div>
 <h2>Contact</h2>
 <div class="card">
   <div><strong>Address</strong><br/><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=169%20Majorca%20Ave%20nan%20Coral%20Gables%20FL%20331344553" target="_blank" rel="noopener">169 Majorca Ave<br/>nan<br/>Coral Gables, FL 331344553</a></div>
@@ -38,10 +44,16 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Physician", "name": "Dr. Leilani Padron, nan", "medicalSpecialty": "Podiatry", "identifier": "1003793241", "address": {"@type": "PostalAddress", "streetAddress": "169 Majorca Ave nan", "addressLocality": "Coral Gables", "addressRegion": "FL", "postalCode": "331344553", "addressCountry": "US"}, "telephone": "+17866153583", "url": "https://PodoGuide.com/podiatrist/1003793241-padron-leilani/"}</script>
 
 </div></main>
-<footer>
-  <div class="container small">
-    <div>© 2025 PodoGuide · Data source: NPPES NPI Registry · As of 2025-11-06</div>
-    <div class="small">This site provides general information and directory listings and does not provide medical advice. If you think you may have a foot or ankle emergency, call your local emergency number or visit the nearest emergency department.</div>
+<footer class="footer">
+  <div class="container stack">
+    <ul class="footer-links">
+      <li><a href="/podoguide/privacy/">Privacy</a></li>
+      <li><a href="/podoguide/terms/">Terms</a></li>
+      <li><a href="/podoguide/about/">About</a></li>
+      <li><a href="/podoguide/contact/">Contact</a></li>
+    </ul>
+    <p>Data source: NPPES NPI Registry · refreshed 2025-11-06.</p>
+    <p class="meta">PodoGuide shares educational information and directory listings only. It does not provide medical advice. Call emergency services for urgent or limb-threatening concerns.</p>
   </div>
 </footer>
 </body>

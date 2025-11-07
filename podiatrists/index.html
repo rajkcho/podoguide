@@ -11,16 +11,18 @@
 </head>
 <body class="podiatrists-landing">
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-header">
-  <div class="container nav">
-    <a href="/podoguide/" class="brand" aria-label="PodoGuide Home">
-      <img src="/podoguide/assets/logo.svg" alt="" height="40" width="40"/>PodoGuide
+<header class="site-header" role="banner">
+  <div class="container header-wrap">
+    <a class="brand" href="/podoguide/" aria-label="PodoGuide home">
+      <img class="brand-logo" src="/podoguide/assets/logo.svg" alt="PodoGuide"/>
     </a>
-    <nav aria-label="Primary">
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    <nav id="site-nav" class="site-nav" aria-label="Primary">
       <ul>
         <li><a href="/podoguide/podiatrists/">Podiatrists</a></li>
         <li><a href="/podoguide/conditions/">Conditions</a></li>
         <li><a href="/podoguide/treatments/">Treatments</a></li>
+        <li><a href="/podoguide/insights/">Insights</a></li>
         <li><a href="/podoguide/about/">About</a></li>
         <li><a href="/podoguide/contact/">Contact</a></li>
       </ul>
@@ -46,14 +48,46 @@
     </div>
   </section>
   <section class="container stack">
-    <div class="card map-card stack">
+    <div class="card florida-map stack">
       <h2>Florida map</h2>
       <figure class="stack">
-        <svg class="fl-map" viewBox="0 0 420 640" role="img" aria-labelledby="directory-map-title">
-          <title id="directory-map-title">Florida map (illustrative outline)</title>
-          <path d="M36 168 L38 146 L62 132 L142 122 L210 100 L250 106 L306 124 L340 150 L360 188 L356 220 L378 254 L392 300 L388 332 L402 360 L398 388 L410 420 L398 450 L390 486 L370 528 L352 562 L336 580 L312 590 L290 584 L268 556 L246 512 L226 468 L200 420 L178 378 L152 330 L128 284 L104 238 L84 210 L60 188 Z"/>
-        </svg>
-        <figcaption class="map-note">Florida map (illustrative). Hover or tap future enhancements will highlight cities.</figcaption>
+        <div class="florida-map">
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 640'>
+  <path class='state' d='M36 168 L38 146 L62 132 L142 122 L210 100 L250 106 L306 124 L340 150 L360 188 L356 220 L378 254 L392 300 L388 332 L402 360 L398 388 L410 420 L398 450 L390 486 L370 528 L352 562 L336 580 L312 590 L290 584 L268 556 L246 512 L226 468 L200 420 L178 378 L152 330 L128 284 L104 238 L84 210 L60 188 Z'/>
+  <circle class='city' cx='308' cy='520' r='4'><title>Miami</title></circle>
+  <circle class='city' cx='225' cy='330' r='4'><title>Orlando</title></circle>
+  <circle class='city' cx='175' cy='370' r='4'><title>Tampa</title></circle>
+  <circle class='city' cx='255' cy='210' r='4'><title>Jacksonville</title></circle>
+  <circle class='city' cx='168' cy='385' r='4'><title>St. Petersburg</title></circle>
+  <circle class='city' cx='305' cy='508' r='4'><title>Hialeah</title></circle>
+  <circle class='city' cx='302' cy='488' r='4'><title>Fort Lauderdale</title></circle>
+  <circle class='city' cx='150' cy='205' r='4'><title>Tallahassee</title></circle>
+  <circle class='city' cx='290' cy='445' r='4'><title>Port St. Lucie</title></circle>
+  <circle class='city' cx='215' cy='430' r='4'><title>Cape Coral</title></circle>
+  <circle class='city' cx='295' cy='498' r='4'><title>Pembroke Pines</title></circle>
+  <circle class='city' cx='300' cy='482' r='4'><title>Hollywood</title></circle>
+  <circle class='city' cx='215' cy='265' r='4'><title>Gainesville</title></circle>
+  <circle class='city' cx='292' cy='502' r='4'><title>Miramar</title></circle>
+  <circle class='city' cx='285' cy='470' r='4'><title>Coral Springs</title></circle>
+  <circle class='city' cx='170' cy='365' r='4'><title>Clearwater</title></circle>
+  <circle class='city' cx='275' cy='405' r='4'><title>Palm Bay</title></circle>
+  <circle class='city' cx='286' cy='452' r='4'><title>West Palm Beach</title></circle>
+  <circle class='city' cx='288' cy='478' r='4'><title>Pompano Beach</title></circle>
+  <circle class='city' cx='205' cy='345' r='4'><title>Lakeland</title></circle>
+  <circle class='city' cx='294' cy='492' r='4'><title>Davie</title></circle>
+  <circle class='city' cx='300' cy='500' r='4'><title>Miami Gardens</title></circle>
+  <circle class='city' cx='235' cy='315' r='4'><title>Deltona</title></circle>
+  <circle class='city' cx='285' cy='462' r='4'><title>Boca Raton</title></circle>
+  <circle class='city' cx='250' cy='270' r='4'><title>Palm Coast</title></circle>
+  <circle class='city' cx='190' cy='395' r='4'><title>Sarasota</title></circle>
+  <circle class='city' cx='215' cy='285' r='4'><title>Ocala</title></circle>
+  <circle class='city' cx='110' cy='180' r='4'><title>Pensacola</title></circle>
+  <circle class='city' cx='228' cy='338' r='4'><title>Kissimmee</title></circle>
+  <circle class='city' cx='255' cy='470' r='4'><title>Naples</title></circle>
+  <circle class='city' cx='185' cy='380' r='4'><title>Bradenton</title></circle>
+</svg>
+        </div>
+        <figcaption class="map-note">Tap or hover a dot to reveal the city name.</figcaption>
       </figure>
       <p class="meta">Prefer a list? Jump to the A–Z index to skim every city and the number of podiatrists we track there.</p>
     </div>
@@ -82,7 +116,7 @@
       <li><a href="/podoguide/contact/">Contact</a></li>
     </ul>
     <p>Data source: NPPES NPI Registry · refreshed 2025-11-06.</p>
-    <p class="meta">PodoGuide shares educational information and directory listings only. It does not provide medical advice.</p>
+    <p class="meta">PodoGuide shares educational information and directory listings only. It does not provide medical advice. Call emergency services for urgent or limb-threatening concerns.</p>
   </div>
 </footer>
 </body>

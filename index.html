@@ -33,16 +33,18 @@
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-header">
-  <div class="container nav">
-    <a href="/podoguide/" class="brand" aria-label="PodoGuide Home">
-      <img src="/podoguide/assets/logo.svg" alt="" height="40" width="40"/>PodoGuide
+<header class="site-header" role="banner">
+  <div class="container header-wrap">
+    <a class="brand" href="/podoguide/" aria-label="PodoGuide home">
+      <img class="brand-logo" src="/podoguide/assets/logo.svg" alt="PodoGuide"/>
     </a>
-    <nav aria-label="Primary">
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    <nav id="site-nav" class="site-nav" aria-label="Primary">
       <ul>
         <li><a href="/podoguide/podiatrists/">Podiatrists</a></li>
         <li><a href="/podoguide/conditions/">Conditions</a></li>
         <li><a href="/podoguide/treatments/">Treatments</a></li>
+        <li><a href="/podoguide/insights/">Insights</a></li>
         <li><a href="/podoguide/about/">About</a></li>
         <li><a href="/podoguide/contact/">Contact</a></li>
       </ul>
@@ -52,6 +54,9 @@
 <main id="main">
   <section class="hero stack container">
     <p class="eyebrow">Florida coverage</p>
+    <figure class="hero-photo">
+      <img src="/podoguide/assets/hero-florida.jpg" alt="Florida coastline and skyline" width="1600" height="900" loading="eager" fetchpriority="high"/>
+    </figure>
     <h1>Florida podiatrists, curated for every step</h1>
     <p class="lead">PodoGuide tracks board-certified foot and ankle specialists across Florida so you can compare clinics, treatments, and experience before booking.</p>
     <div class="cluster hero-actions">
@@ -59,7 +64,7 @@
       <a class="btn secondary" href="/podoguide/contact/">Talk with a care guide</a>
     </div>
   </section>
-  <div class="ad-slot ad-slot--leaderboard" aria-hidden="true">728×90 ad placeholder</div>
+  <div class="ad ad-728x90" role="complementary" aria-label="Advertisement">Display ad 728×90 (320×100 on mobile)</div>
   <section class="container stack" aria-label="Why Floridians trust PodoGuide">
     <div class="trust-grid">
       <article class="trust-card">
@@ -130,7 +135,7 @@
         <a class="btn primary" href="/podoguide/podiatrists/fl/">Explore all Florida cities</a>
       </div>
     </div>
-    <div class="ad-slot ad-slot--rectangle" aria-hidden="true">300×250 ad placeholder</div>
+    <div class="ad ad-728x90" role="complementary" aria-label="Advertisement">Display ad 728×90 (320×100 on mobile)</div>
   </section>
   <section class="container home-insights" aria-labelledby="home-insights-heading">
     <div class="stack">
@@ -149,7 +154,7 @@
       <li><a href="/podoguide/contact/">Contact</a></li>
     </ul>
     <p>Data source: NPPES NPI Registry · refreshed 2025-11-06.</p>
-    <p class="meta">PodoGuide shares educational information and directory listings only. It does not provide medical advice. Call emergency services immediately if you have a limb-threatening concern.</p>
+    <p class="meta">PodoGuide shares educational information and directory listings only. It does not provide medical advice. Call emergency services for urgent or limb-threatening concerns.</p>
   </div>
 </footer>
 </body>

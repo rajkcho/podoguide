@@ -22,16 +22,18 @@
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-header">
-  <div class="container nav">
-    <a href="/podoguide/" class="brand" aria-label="PodoGuide Home">
-      <img src="/podoguide/assets/logo.svg" alt="" height="40" width="40"/>PodoGuide
+<header class="site-header" role="banner">
+  <div class="container header-wrap">
+    <a class="brand" href="/podoguide/" aria-label="PodoGuide home">
+      <img class="brand-logo" src="/podoguide/assets/logo.svg" alt="PodoGuide"/>
     </a>
-    <nav aria-label="Primary">
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    <nav id="site-nav" class="site-nav" aria-label="Primary">
       <ul>
         <li><a href="/podoguide/podiatrists/">Podiatrists</a></li>
         <li><a href="/podoguide/conditions/">Conditions</a></li>
         <li><a href="/podoguide/treatments/">Treatments</a></li>
+        <li><a href="/podoguide/insights/">Insights</a></li>
         <li><a href="/podoguide/about/">About</a></li>
         <li><a href="/podoguide/contact/">Contact</a></li>
       </ul>
@@ -781,7 +783,7 @@
       <li><a href="/podoguide/contact/">Contact</a></li>
     </ul>
     <p>Data source: NPPES NPI Registry · refreshed 2025-11-06.</p>
-    <p class="meta">Information provided for education only; contact a licensed professional for care.</p>
+    <p class="meta">PodoGuide shares educational information and directory listings only. It does not provide medical advice. Call emergency services for urgent or limb-threatening concerns.</p>
   </div>
 </footer>
 </body>
