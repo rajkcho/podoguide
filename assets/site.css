@@ -221,21 +221,30 @@ footer{
 .hero{
   display:grid;
   gap:24px;
-  align-items:center;
+  align-items:start;
   margin-top:32px;
 }
 @media(min-width:900px){
   .hero{
     grid-template-columns:1.2fr 1fr;
+    align-items:stretch;
   }
 }
-.hero-copy{max-width:560px}
+.hero-copy{
+  max-width:560px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
 .hero-copy p{font-size:18px;color:var(--muted);margin-top:16px}
 .hero-visual{
   background:var(--surface);
   border-radius:24px;
   padding:24px;
   box-shadow:var(--shadow);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
 }
 .hero-visual strong{display:block;font-size:22px;margin-bottom:12px}
 .hero-media{
@@ -279,28 +288,12 @@ footer{
   position:relative;
   border-radius:28px;
   overflow:hidden;
+  min-height:360px;
 }
-.map-base{
-  display:block;
+.map-wrapper svg{
   width:100%;
-  max-height:520px;
-  object-fit:cover;
-  filter:saturate(1.15) contrast(1.05);
-}
-.map-flag{
-  position:absolute;
-  top:-30px;
-  right:min(6vw,48px);
-  max-width:160px;
-  width:140px;
+  height:auto;
   display:block;
-  filter:drop-shadow(0 12px 30px rgba(12,26,61,.25));
-  animation:floatFlag 7s ease-in-out infinite;
-}
-@keyframes floatFlag{
-  0%{transform:translateY(0);}
-  50%{transform:translateY(-6px);}
-  100%{transform:translateY(0);}
 }
 .map-marker{
   position:absolute;
@@ -317,6 +310,7 @@ footer{
   cursor:pointer;
   transition:transform .2s ease,box-shadow .2s ease;
   font:inherit;
+  z-index:1;
 }
 .map-marker span{pointer-events:none}
 .map-marker::after{
@@ -368,6 +362,73 @@ footer{
   gap:12px;
   align-items:center;
 }
+.city-overlay{
+  position:absolute;
+  top:24px;
+  right:24px;
+  width:min(360px,45%);
+  background:rgba(244,247,251,.95);
+  border-radius:24px;
+  padding:18px 20px;
+  box-shadow:0 35px 60px -35px rgba(12,26,61,.55);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  pointer-events:none;
+}
+.city-overlay > *{
+  pointer-events:auto;
+}
+.city-overlay h3{
+  margin:0;
+  font-size:20px;
+}
+.city-overlay .meta{
+  margin:0;
+}
+.city-overlay .input{
+  width:100%;
+  min-width:0;
+}
+.city-list{
+  list-style:none;
+  margin:0;
+  padding:0;
+  max-height:380px;
+  overflow:auto;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.city-list li a{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  padding:10px 12px;
+  border-radius:16px;
+  background:#fff;
+  border:1px solid rgba(217,226,242,.8);
+  color:inherit;
+  font-weight:600;
+}
+.city-list li a span{
+  font-size:13px;
+  font-weight:500;
+  color:var(--muted);
+}
+.city-list li a:hover{
+  border-color:var(--link);
+  color:var(--link-strong);
+}
+@media(max-width:900px){
+  .city-overlay{
+    position:static;
+    width:100%;
+  }
+  .map-wrapper{
+    min-height:280px;
+  }
+}
 .google-reviews{
   margin-top:16px;
   padding-top:12px;
@@ -399,6 +460,12 @@ footer{
 }
 .home-insights{
   margin:48px 0;
+}
+.podiatrists-map{
+  margin:32px 0 48px 0;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
 }
 .home-insights-grid{
   display:grid;

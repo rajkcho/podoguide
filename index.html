@@ -34,7 +34,7 @@
       <a class="btn" href="/podoguide/treatments/">Review treatment options</a>
     </div>
     <div class="hero-media">
-      <img src="https://images.unsplash.com/photo-1504439904031-93ded9f93e4e?auto=format&fit=crop&w=1400&q=80" alt="Doctor assisting a patient during a foot examination"/>
+      <img src="https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?auto=format&fit=crop&w=1400&q=80" alt="Doctor supporting an elderly patient during a consultation"/>
     </div>
   </div>
   <div class="hero-visual">
@@ -65,10 +65,21 @@
 </section>
 
 <section class="map-section" aria-label="Florida coverage map">
-  <img class="map-flag" src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Flag_of_Florida.svg" alt="Flag of Florida"/>
   <div class="map-shell">
     <div class="map-wrapper">
-      <img class="map-base" src="https://upload.wikimedia.org/wikipedia/commons/3/32/Florida_in_United_States.svg" alt="Detailed map of Florida highlighting the peninsula and panhandle"/>
+      <svg class="map-illustration" viewBox="0 0 360 620" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="homeFloridaGradient" x1="15%" y1="0%" x2="90%" y2="100%">
+            <stop offset="0%" stop-color="#93c5fd" stop-opacity="0.95"/>
+            <stop offset="55%" stop-color="#60a5fa" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#2563eb" stop-opacity="0.95"/>
+          </linearGradient>
+          <filter id="homeFloridaShadow" x="-10%" y="-10%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="18" stdDeviation="12" flood-color="rgba(15,23,42,.35)"/>
+          </filter>
+        </defs>
+        <path d="M38 115 L172 90 L214 120 L202 168 L230 236 L282 310 L322 400 L308 450 L330 510 L346 580 L314 612 L258 602 L208 548 L174 500 L142 456 L112 402 L92 340 L88 280 L84 232 L60 168 Z" fill="url(#homeFloridaGradient)" filter="url(#homeFloridaShadow)" stroke="#1d4ed8" stroke-width="2"/>
+      </svg>
       <button type="button" class="map-marker" style="--x:67.78%;--y:91.29%;" aria-label="Miami, FL — 5,048 podiatrists" data-city="Miami, FL" data-count="5,048 podiatrists" data-link="/podoguide/podiatrists/fl/miami/">
         <span>Miami</span>
       </button>

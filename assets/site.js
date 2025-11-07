@@ -197,7 +197,49 @@ async function loadGoogleReviews(){
   }
 }
 
+async function initCityDirectory(){
+  if(!document.body.classList.contains('podiatrists-landing')) return;
+  const listEl = document.getElementById('city-map-list');
+  const searchEl = document.getElementById('city-map-search');
+  const countEl = document.getElementById('city-map-count');
+  if(!listEl || !searchEl) return;
+  try{
+    const resp = await fetch('/podoguide/assets/cities.json',{cache:'no-store'});
+    if(!resp.ok) throw new Error('City data missing');
+    const cities = await resp.json();
+    let filtered = cities;
+    const render = ()=>{
+      listEl.innerHTML = '';
+      if(!filtered.length){
+        const empty = document.createElement('li');
+        empty.innerHTML = '<p class="meta">No cities match that search.</p>';
+        listEl.appendChild(empty);
+        if(countEl){ countEl.textContent = '0 cities'; }
+        return;
+      }
+      filtered.forEach(city=>{
+        const li = document.createElement('li');
+        const countText = city.count ? `${city.count.toLocaleString()} podiatrists` : 'View directory';
+        li.innerHTML = `<a href="${city.href}"><strong>${city.name}, FL</strong><span>${countText}</span></a>`;
+        listEl.appendChild(li);
+      });
+      if(countEl){ countEl.textContent = `${filtered.length} cities`; }
+    };
+    const handleInput = ()=>{
+      const q = normalize(searchEl.value);
+      filtered = cities.filter(city=>normalize(city.name).includes(q));
+      render();
+    };
+    searchEl.addEventListener('input', handleInput);
+    render();
+  }catch(e){
+    listEl.innerHTML = '<li><p class="meta">Unable to load cities right now.</p></li>';
+    if(countEl){ countEl.textContent = 'City directory unavailable'; }
+  }
+}
+
 document.addEventListener('DOMContentLoaded', ()=>{
   initMap();
   loadGoogleReviews();
+  initCityDirectory();
 });
