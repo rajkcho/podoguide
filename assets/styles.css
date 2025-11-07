@@ -54,15 +54,50 @@ p{margin:0 0 var(--space-3) 0}
 .ad{border:1px dashed var(--border);border-radius:var(--r);background:#f8fafc;color:var(--muted);display:flex;align-items:center;justify-content:center;margin:var(--space-4) auto;max-width:728px;width:100%;height:90px}
 @media(max-width:760px){.ad{max-width:320px;height:100px}}
 .florida-map{position:relative}
-.florida-map svg{width:100%;max-width:none;margin:0 auto var(--space-2)}
+.florida-map svg{width:100%;max-width:none;margin:0 auto var(--space-2);display:block}
+.florida-map .map-heading{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  margin:0;
+  padding:var(--space-2) var(--space-4);
+  background:rgba(255,255,255,.92);
+  border-radius:var(--r);
+  pointer-events:none;
+  text-align:center;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  font-size:clamp(1rem,2vw,1.4rem);
+  color:#0f172a;
+  box-shadow:var(--shadow);
+  z-index:2;
+}
 .florida-map .state{fill:#dbeafe;stroke:#2563eb;stroke-width:.9}
 .florida-map .city{fill:#0a66c2;opacity:.9}
 .florida-map .city:hover{opacity:1}
 .florida-map a circle{cursor:pointer}
-.florida-map text:not(.city-label){fill:#1e3a8a;font-weight:600;font-size:1.25rem;text-anchor:middle}
-.city-label{fill:#0f172a;font-size:20px;pointer-events:none}
+.florida-map text{fill:#1e3a8a;font-weight:600;font-size:1.25rem;text-anchor:middle}
+.map-label-layer{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  font-family:ui-sans-serif,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  font-size:20px;
+  color:#0f172a;
+  z-index:1;
+}
+.map-label{
+  position:absolute;
+  left:calc((var(--x) / 420) * 100%);
+  top:calc((var(--y) / 640) * 100%);
+  transform:translate(-2px,-4px);
+  white-space:nowrap;
+  font-weight:600;
+}
 .popular-searches{gap:var(--space-3);padding-top:var(--space-6)}
 .popular-searches h2{margin-bottom:var(--space-2)}
+.popular-searches.container-wide{max-width:135rem}
 .popular-searches .florida-map{margin:0 auto;border:0;padding:0;background:transparent}
 .popular-searches .florida-map svg{margin:0 auto}
 .map-tooltip{
@@ -79,6 +114,7 @@ p{margin:0 0 var(--space-3) 0}
   transition:opacity .15s ease;
   left:0;
   top:0;
+  z-index:3;
 }
 .list-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-2);padding:var(--space-3);border:1px solid var(--border);border-radius:var(--r);background:#fff;box-shadow:var(--shadow)}
 .list-row .sub{color:var(--muted);font-size:.95rem}
