@@ -31,8 +31,8 @@ p{margin:0 0 var(--space-3) 0}
   .site-nav.open{display:block}
   .site-nav ul{flex-direction:column;gap:var(--space-2);margin-top:var(--space-2)}
 }
-.hero-photo img{width:50%;max-width:520px;margin:0 auto var(--space-4);border-radius:var(--r);object-fit:cover;box-shadow:var(--shadow)}
-@media(max-width:768px){.hero-photo img{width:100%;}}
+.hero-photo img{width:100%;max-width:728px;height:200px;margin:0 auto var(--space-4);border-radius:var(--r);object-fit:cover;box-shadow:var(--shadow)}
+@media(max-width:768px){.hero-photo img{height:180px}}
 .hero{text-align:center;gap:var(--space-4);padding:var(--space-8) var(--space-4) var(--space-6)}
 .hero .lead{font-size:1.1rem;color:var(--muted);margin:0 auto;max-width:42rem}
 .cluster{display:flex;flex-wrap:wrap;gap:var(--space-3);justify-content:center}
