@@ -56,7 +56,7 @@ function renderArticle(articles){
   const author = document.createElement('div');
   author.className = 'author-card';
   author.innerHTML = `
-    <img src="/podoguide/assets/mary-voight.svg" alt="Portrait of Mary Voight"/>
+    <img src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=320&q=80" alt="Portrait of Mary Voight, DPM — blonde clinician with blue eyes wearing dark glasses"/>
     <div>
       <strong>Mary Voight, DPM</strong>
       <span class="meta">Clinical editor &amp; podiatric surgeon</span>

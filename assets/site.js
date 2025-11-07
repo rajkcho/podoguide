@@ -80,9 +80,11 @@ async function sortByDistance(){
 
 function initMap(){
   const shell = document.querySelector('.map-shell');
+  if(!shell) return;
+  const wrapper = shell.querySelector('.map-wrapper');
   const tooltip = document.getElementById('map-tooltip');
-  if(!shell || !tooltip) return;
-  const markers = shell.querySelectorAll('.map-marker');
+  if(!wrapper || !tooltip) return;
+  const markers = wrapper.querySelectorAll('.map-marker');
   if(!markers.length) return;
   let hideTimer = null;
   const positionTooltip = (marker, evt)=>{
@@ -118,7 +120,6 @@ function initMap(){
     if(link){ window.location.href = link; }
   };
   markers.forEach(marker=>{
-    const cityName = marker.getAttribute('data-target-city');
     const enter = evt=>{
       showTooltip(marker, evt);
       marker.classList.add('is-active');
@@ -134,7 +135,10 @@ function initMap(){
     marker.addEventListener('mousemove', evt=>showTooltip(marker, evt));
     marker.addEventListener('touchstart', evt=>enter(evt));
     marker.addEventListener('touchend', leave);
-    marker.addEventListener('click', evt=>{ evt.preventDefault(); goToCity(marker); });
+    marker.addEventListener('click', evt=>{
+      evt.preventDefault();
+      goToCity(marker);
+    });
     marker.addEventListener('keydown', evt=>{
       if(evt.key==='Enter' || evt.key===' '){
         evt.preventDefault();
@@ -144,4 +148,56 @@ function initMap(){
   });
 }
 
-document.addEventListener('DOMContentLoaded', initMap);
+async function loadGoogleReviews(){
+  if(!document.body.classList.contains('podiatrist-page')) return;
+  const npi = document.body.getAttribute('data-npi');
+  if(!npi) return;
+  const contactCard = document.querySelector('h2 + .card');
+  if(!contactCard) return;
+  let reviewsBlock = contactCard.querySelector('.google-reviews');
+  if(!reviewsBlock){
+    reviewsBlock = document.createElement('div');
+    reviewsBlock.className = 'google-reviews';
+    const heading = document.createElement('strong');
+    heading.textContent = 'Google reviews';
+    const meta = document.createElement('p');
+    meta.className = 'meta';
+    meta.textContent = 'Checking Google reviews…';
+    reviewsBlock.appendChild(heading);
+    reviewsBlock.appendChild(meta);
+    contactCard.appendChild(reviewsBlock);
+  }
+  const statusEl = reviewsBlock.querySelector('.meta');
+  try{
+    const resp = await fetch('/podoguide/assets/reviews.json',{cache:'no-store'});
+    if(!resp.ok) throw new Error('Missing reviews');
+    const data = await resp.json();
+    const match = Array.isArray(data) ? data.find(item=>String(item.npi)===String(npi)) : null;
+    if(match && typeof match.rating==='number' && typeof match.count==='number'){
+      const rating = match.rating.toFixed(1);
+      const count = match.count.toLocaleString();
+      statusEl.innerHTML = `<span class="rating-pill">${rating} ★</span> ${count} Google reviews`;
+      if(match.url){
+        let link = reviewsBlock.querySelector('.review-link');
+        if(!link){
+          link = document.createElement('a');
+          link.className = 'review-link';
+          reviewsBlock.appendChild(link);
+        }
+        link.href = match.url;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.textContent = 'Read on Google';
+      }
+    }else{
+      statusEl.textContent = 'Google reviews not yet available for this clinician.';
+    }
+  }catch(e){
+    statusEl.textContent = 'Unable to load Google reviews right now.';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  initMap();
+  loadGoogleReviews();
+});
