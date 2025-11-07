@@ -1,7 +1,7 @@
 <!-- Outline derived from public-domain U.S. Census TIGER/Line data -->
 <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink="http://www.w3.org/1999/xlink" viewBox='0 0 420 640'>
   <style>
-    .city-label{font-size:12px;font-family:ui-sans-serif,-apple-system,Segoe UI,Roboto,Helvetica,Arial;fill:#0f172a;}
+    .city-label{font-size:16px;font-family:ui-sans-serif,-apple-system,Segoe UI,Roboto,Helvetica,Arial;fill:#0f172a;}
   </style>
   <path class='state' d='M36 168 L38 146 L62 132 L142 122 L210 100 L250 106 L306 124 L340 150 L360 188 L356 220 L378 254 L392 300 L388 332 L402 360 L398 388 L410 420 L398 450 L390 486 L370 528 L352 562 L336 580 L312 590 L290 584 L268 556 L246 512 L226 468 L200 420 L178 378 L152 330 L128 284 L104 238 L84 210 L60 188 Z'/>
   <text class='state-label' x='210' y='330'>Florida</text>
