@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="maryTitle maryDesc">
+  <title id="maryTitle">Portrait of Mary Voight</title>
+  <desc id="maryDesc">Illustrated blonde woman with glasses</desc>
+  <defs>
+    <linearGradient id="skin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fddac5"/>
+      <stop offset="100%" stop-color="#f2b99c"/>
+    </linearGradient>
+    <clipPath id="circle">
+      <circle cx="80" cy="80" r="74"/>
+    </clipPath>
+  </defs>
+  <circle cx="80" cy="80" r="78" fill="#fef5ec" stroke="#d8c5b3" stroke-width="4"/>
+  <g clip-path="url(#circle)">
+    <rect x="0" y="0" width="160" height="160" fill="#fef5ec"/>
+    <ellipse cx="80" cy="60" rx="70" ry="60" fill="#f5d081"/>
+    <circle cx="80" cy="92" r="52" fill="url(#skin)"/>
+    <path d="M32 110 Q80 130 128 110" fill="#f9c19b"/>
+    <path d="M42 96 h28" stroke="#4a3a2f" stroke-width="4" stroke-linecap="round"/>
+    <path d="M90 96 h28" stroke="#4a3a2f" stroke-width="4" stroke-linecap="round"/>
+    <path d="M50 96 q-6 4 0 8 h20 q6-4 0-8 z" fill="none" stroke="#2e2a2c" stroke-width="4"/>
+    <path d="M90 96 q-6 4 0 8 h20 q6-4 0-8 z" fill="none" stroke="#2e2a2c" stroke-width="4"/>
+    <circle cx="60" cy="104" r="6" fill="#2e2a2c"/>
+    <circle cx="110" cy="104" r="6" fill="#2e2a2c"/>
+    <path d="M68 130 q12 10 24 0" fill="none" stroke="#b6655c" stroke-width="4" stroke-linecap="round"/>
+    <path d="M35 70 q45-30 90 0" fill="none" stroke="#d8ad52" stroke-width="8" stroke-linecap="round"/>
+    <path d="M20 55 q20-40 60-40 q40 0 60 40" fill="none" stroke="#f5d081" stroke-width="14" stroke-linecap="round"/>
+    <rect x="0" y="120" width="160" height="70" fill="#5d6fa3"/>
+  </g>
+</svg>

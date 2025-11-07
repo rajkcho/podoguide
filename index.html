@@ -7,6 +7,7 @@
 <title>Podiatrists in Florida • PodoGuide</title>
 <link rel="stylesheet" href="/podoguide/assets/site.css"/>
 <script defer src="/podoguide/assets/site.js"></script>
+<script defer src="/podoguide/assets/insights.js"></script>
 </head>
 <body>
 <header>
@@ -16,6 +17,7 @@
       <a href="/podoguide/podiatrists/">Podiatrists</a>
       <a href="/podoguide/conditions/">Conditions</a>
       <a href="/podoguide/treatments/">Treatments</a>
+      <a href="/podoguide/insights/">Insights</a>
       <a href="/podoguide/about/">About</a>
       <a href="/podoguide/contact/">Contact</a>
     </nav>
@@ -39,6 +41,9 @@
       <li><strong>180</strong> cities with appointment-ready clinics</li>
       <li><strong>Peer-reviewed</strong> insights distilled from leading podiatry journals</li>
     </ul>
+    <div class="hero-media">
+      <img src="https://images.unsplash.com/photo-1580281657521-3b1b4c53c6c5?auto=format&fit=crop&w=1200&q=80" alt="Podiatrist reviewing imaging with a patient"/>
+    </div>
   </div>
 </section>
 
@@ -59,7 +64,9 @@
   </div>
 </section>
 
-<section class="map-section" aria-labelledby="popular-cities-heading">
+<section class="map-section" aria-labelledby="map-heading">
+  <img class="map-flag" src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Flag_of_Florida.svg" alt="Flag of Florida"/>
+  <h2 class="map-heading" id="map-heading">Main Podiatry Hubs in Florida</h2>
   <div class="map-shell">
     <svg viewBox="0 0 360 620" role="img" aria-labelledby="florida-map-title florida-map-desc">
       <title id="florida-map-title">Florida map with featured podiatry cities</title>
@@ -71,7 +78,7 @@
           <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.85"/>
         </linearGradient>
       </defs>
-      <path class="map-outline" d="M32 112 L178 96 L214 122 L202 164 L225 228 L276 298 L314 380 L300 430 L316 482 L340 560 L309 608 L258 600 L212 544 L178 496 L148 448 L118 402 L92 336 L84 280 L82 228 L62 170 Z"/>
+      <path class="map-outline" d="M38 115 L172 90 L214 120 L202 168 L230 236 L282 310 L322 400 L308 450 L330 510 L346 580 L314 612 L258 602 L208 548 L174 500 L142 456 L112 402 L92 340 L88 280 L84 232 L60 168 Z"/>
       <g class='map-marker' role='link' tabindex='0' aria-label='Miami, FL — 5,048 podiatrists' data-city='Miami, FL' data-count='5,048 podiatrists' data-link='/podoguide/podiatrists/fl/miami/' data-target-city='Miami' transform='translate(244 566)'>
         <circle cx='0' cy='0' r='10'/>
       </g>
@@ -111,41 +118,14 @@
     </svg>
     <div class="map-tooltip" id="map-tooltip" role="status" aria-live="polite"></div>
   </div>
-  <div class="map-copy">
-    <h3 id="popular-cities-heading">Explore Florida’s podiatry hubs</h3>
-    <p>Use the interactive map to jump directly into the metro that matches your travel radius. Hover, tap, or keyboard-navigate through each marker to preview how many podiatrists we currently track and open the city directory in a single click.</p>
-    <p class="meta">Coverage sources: Florida Department of Health licensure files, NPPES NPI Registry, hospital affiliation rosters, and direct practice submissions.</p>
-  </div>
 </section>
 
 <div class="ad">Ad slot (728×90)</div>
 
-<section class="articles" aria-labelledby="articles-heading">
-  <h2 id="articles-heading">Latest podiatry insights</h2>
-  <article class="card">
-    <h3>Weight-bearing CT pairs with AI for precise reconstructions</h3>
-    <p>Clinicians at the 2025 Journal of Foot &amp; Ankle Surgery imaging roundtable showcased how weight-bearing CT (WBCT) is reshaping operative planning across Florida. Because scans are captured while the patient stands, surgeons in Tampa, Jacksonville, and Miami can visualise Lisfranc instability, midfoot collapse, or subtalar incongruities that disappear on traditional CT. Multiple health systems now run WBCT alongside pedobarographic pressure mapping so biomechanical data and bone geometry are reviewed in the same session, trimming the average pre-op workup by six days and reducing the need for exploratory arthroscopy.</p>
-    <p>The latest twist involves AI-assisted reconstruction. Datasets from more than 18,000 anonymised WBCT scans were used to train neural networks that automatically segment the tarsometatarsal complex and flag angular outliers. Orlando Health reports that AI-generated heat maps shaved 30 percent off radiologist turnaround time and improved inter-rater agreement when deciding between fusion and joint-sparing osteotomies. During residency workshops, trainees now learn to overlay the AI output with fluoroscopic shots to anticipate where plates or screws might crowd the cortex once the patient is weight bearing.</p>
-    <p>Cost and radiation exposure were long-standing objections, but those barriers continue to fall. Mobile WBCT suites—essentially shielded trailers—are circulating between regional clinics so patients in Pensacola or the Panhandle no longer drive hours for advanced imaging. Dose reduction algorithms have also pushed exposure levels near that of a standard multi-view radiographic series, satisfying risk managers who scrutinise cumulative exposure for chronic patients.</p>
-    <p>Hospitals are pairing the technology with enhanced recovery pathways. After obtaining WBCT, podiatric surgeons can 3D-print rehearsal bones or guides that map the exact trajectory of osteotomies, cutting operative time and anaesthesia requirements. Post-op, the same scanners verify union under load before patients graduate from CAM boots to footwear. The result is a full feedback loop: dynamic diagnostics, data-informed hardware placement, and objective confirmation that the reconstruction performs as designed in real life.</p>
-    <p>Insurers are taking note. Florida Blue expanded its coverage policy for WBCT when documentation links the scan to surgical decision-making, and UnitedHealthcare’s Gulf Coast medical directors recently approved bundled authorisations that include WBCT plus AI analysis for complex midfoot trauma. Expect even broader access over the coming year as more practices demonstrate that better imaging on the front end prevents costly revisions down the road.</p>
-  </article>
-  <article class="card">
-    <h3>Neuromodulation gains traction for stubborn diabetic neuropathy</h3>
-    <p>Peripheral neuropathy still tops the list of limb-salvage challenges, but Florida clinics are deploying neuromodulation to change that narrative. A February 2025 Diabetes &amp; Metabolic Syndrome review highlighted tibial nerve stimulation (TNS) and implantable peripheral nerve interfaces (PNI) as standout therapies. In Jacksonville, weekly TNS sessions delivered via wearable cuffs cut burning pain scores nearly in half after three months and measurably improved vibration thresholds. At Broward Health, podiatrists place paper-thin PNIs around the medial and lateral plantar nerves; once programmed to the patient’s gait cadence, the devices dampen aberrant firing without the cognitive fog associated with systemic gabapentinoids.</p>
-    <p>These modalities are increasingly paired with remote patient monitoring. AdventHealth’s Orlando program issues Bluetooth plantar-temperature sensors and balance pods to high-risk patients. When data streams show asymmetric loading, nurses can intervene before skin breakdown occurs. Physical therapists then roll patients into ankle proprioception drills and single-leg strengthening, taking advantage of newly restored sensation to rebuild protective reflexes.</p>
-    <p>Coverage is improving but still hinges on meticulous documentation. UnitedHealthcare now authorises TNS after failure of at least two medication classes, provided podiatrists capture Semmes-Weinstein monofilament staging and glycaemic trends in the chart. Blue Cross Blue Shield sponsors a state-wide registry that tracks pain relief, ulcer incidence, and falls for patients implanted with PNIs. Practices that submit outcomes gain streamlined prior authorisations and, in some cases, device rebates.</p>
-    <p>Education remains crucial. The Florida Podiatric Medical Association added hands-on neuromodulation labs to its annual meeting so clinicians can practise lead placement, waveform tuning, and troubleshooting signal drift. Endocrinologists and wound-care physicians are also joining consults to ensure blood sugar, footwear, and vascular status support the neuromodulation plan. Patients appreciate that the strategy treats root-cause nerve signalling rather than masking symptoms.</p>
-    <p>Over the next year, expect to see neuromodulation blended with behavioural coaching. Cleveland Clinic Florida is piloting virtual visits where psychologists help patients cope with the anxiety that often accompanies chronic neuropathic pain, while podiatrists adjust stimulation parameters in real time. Early reports suggest the hybrid model keeps adherence above 80 percent—a critical threshold if neuromodulation is to fulfill its promise of reducing amputations statewide.</p>
-  </article>
-  <article class="card">
-    <h3>Regenerative biologics strengthen Florida’s limb-preservation playbooks</h3>
-    <p>Limb-preservation teams from Miami to Pensacola are refining combined biologic protocols that heal stubborn ulcers and tendon damage faster than traditional care. A March 2025 International Wound Journal update followed 312 Floridians who received dehydrated amniotic membrane overlays plus adipose-derived stem-cell injections for recalcitrant heel and ankle ulcers. Sixty-four percent achieved full epithelialisation within 12 weeks—nearly double historical controls—and hospital admissions for infection dropped accordingly.</p>
-    <p>Podiatric surgeons are also inserting bio-inductive collagen scaffolds during revision Achilles repairs or chronic plantar fascia ruptures. Tampa General’s ultrasound follow-up shows organised tendon fibres by week eight, allowing earlier transition from immobilisation to progressive strengthening. Athletes treated at South Florida sports medicine centres report higher Foot and Ankle Ability Measure scores and quicker returns to running when collagen scaffolds are paired with platelet-rich plasma (PRP) boosters.</p>
-    <p>Because these materials are costly, reimbursement strategy matters. Medicare’s local coverage determination now recognises amniotic allografts for diabetic foot ulcers after four weeks of standard therapy, but podiatrists must document perfusion with transcutaneous oxygen or duplex ultrasound. Practices in Gainesville built EHR templates that prompt vascular readings, HbA1c trends, off-loading details, and infection control steps so every graft bill meets audit standards.</p>
-    <p>Multidisciplinary stewardship keeps outcomes high. Wound-care nurses coordinate negative-pressure dressings, infectious-disease physicians tailor antibiotics, and dietitians focus on protein intake (1.2–1.5 g/kg/day) to fuel collagen synthesis. When osteomyelitis is suspected, surgeons collaborate with interventional radiologists for targeted biopsies before escalating to long-term IV therapy, protecting the efficacy of advanced biologics.</p>
-    <p>Looking forward, Florida startups are trialing smart dressings with embedded sensors that monitor moisture, pH, and pressure. The plan is to integrate that telemetry with clinic dashboards so teams can see in near-real time whether a regenerative therapy is thriving or needs backup. With coordinated documentation, clear patient education, and growing insurer trust, biologics are transitioning from “last resort” status to a standard limb-salvage pillar.</p>
-  </article>
+<section class="home-insights" aria-labelledby="home-insights-heading">
+  <h2 id="home-insights-heading">Fresh insights from Mary Voight, DPM</h2>
+  <div id="home-insights-grid" class="home-insights-grid" data-limit="3" aria-live="polite"></div>
+  <noscript><p class="meta">Enable JavaScript to see the latest articles, or visit the <a href="/podoguide/insights/">Insights</a> section.</p></noscript>
 </section>
 
 </div></main>

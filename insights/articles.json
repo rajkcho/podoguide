@@ -1,0 +1,53 @@
+[
+  {
+    "id": "weight-bearing-ct-ai",
+    "title": "Weight-bearing CT pairs with AI for precise reconstructions",
+    "date": "2025-04-07",
+    "readTime": 8,
+    "heroImage": "https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?auto=format&fit=crop&w=1400&q=80",
+    "excerpt": "Clinicians across Florida are using upright CT plus neural networks to tailor midfoot and rearfoot reconstructions, shorten pre-op planning, and secure payer support.",
+    "seoDescription": "Florida podiatrists explain how weight-bearing CT and AI reconstruction shorten planning time and improve outcomes for complex foot surgery.",
+    "tags": ["Imaging", "AI", "Surgery"],
+    "body": [
+      "Clinicians at the 2025 Journal of Foot & Ankle Surgery imaging roundtable showcased how weight-bearing CT (WBCT) is reshaping operative planning across Florida. Because scans are captured while the patient stands, surgeons in Tampa, Jacksonville, and Miami can visualise Lisfranc instability, midfoot collapse, or subtalar incongruities that disappear on traditional CT. Multiple health systems now run WBCT alongside pedobarographic pressure mapping so biomechanical data and bone geometry are reviewed in the same session, trimming the average pre-operative workup by nearly a week and reducing the need for exploratory arthroscopy.",
+      "The latest twist involves AI-assisted reconstruction. Datasets from more than 18,000 anonymised WBCT scans were used to train neural networks that automatically segment the tarsometatarsal complex and flag angular outliers. Orlando Health reports that AI-generated heat maps shaved 30 percent off radiologist turnaround time and improved inter-rater agreement when deciding between fusion and joint-sparing osteotomies. During residency workshops, trainees now learn to overlay the AI output with fluoroscopic shots to anticipate where plates or screws might crowd the cortex once the patient is weight bearing.",
+      "Cost and radiation exposure were long-standing objections, but those barriers continue to fall. Mobile WBCT suites—essentially shielded trailers—are circulating between regional clinics so patients in Pensacola or the Panhandle no longer drive hours for advanced imaging. Dose-reduction algorithms have also pushed exposure levels near that of a standard multi-view radiographic series, satisfying risk managers who scrutinise cumulative exposure for chronic patients.",
+      "Hospitals are pairing the technology with enhanced recovery pathways. After obtaining WBCT, podiatric surgeons can 3D-print rehearsal bones or guides that map the exact trajectory of osteotomies, cutting operative time and anaesthesia requirements. Post-operatively, the same scanners verify union under load before patients graduate from CAM boots to footwear. The result is a full feedback loop: dynamic diagnostics, data-informed hardware placement, and objective confirmation that the reconstruction performs as designed in real life.",
+      "Insurers are taking note. Florida Blue expanded its coverage policy for WBCT when documentation links the scan to surgical decision-making, and UnitedHealthcare’s Gulf Coast medical directors recently approved bundled authorisations that include WBCT plus AI analysis for complex midfoot trauma. Expect even broader access over the coming year as more practices demonstrate that better imaging on the front end prevents costly revisions down the road."
+    ]
+  },
+  {
+    "id": "neuromodulation-diabetic-neuropathy",
+    "title": "Neuromodulation offers relief for stubborn diabetic neuropathy",
+    "date": "2025-04-05",
+    "readTime": 7,
+    "heroImage": "https://images.unsplash.com/photo-1489278353717-f64c6ee8a4d2?auto=format&fit=crop&w=1400&q=80",
+    "excerpt": "Weekly tibial nerve stimulation, remote monitoring, and miniature peripheral nerve interfaces are cutting pain scores and falls for high-risk Floridians.",
+    "seoDescription": "Florida clinics are pairing tibial nerve stimulation, implantable interfaces, and remote monitoring to reduce diabetic neuropathy pain and ulcer risk.",
+    "tags": ["Neurology", "Diabetes", "Technology"],
+    "body": [
+      "Peripheral neuropathy still tops the list of limb-salvage challenges, but Florida clinics are deploying neuromodulation to change that narrative. A February 2025 Diabetes & Metabolic Syndrome review highlighted tibial nerve stimulation (TNS) and implantable peripheral nerve interfaces (PNI) as standout therapies. In Jacksonville, weekly TNS sessions delivered via wearable cuffs cut burning pain scores nearly in half after three months and measurably improved vibration thresholds. At Broward Health, podiatrists place paper-thin PNIs around the medial and lateral plantar nerves; once programmed to the patient’s gait cadence, the devices dampen aberrant firing without the cognitive fog associated with systemic gabapentinoids.",
+      "These modalities are increasingly paired with remote patient monitoring. AdventHealth’s Orlando program issues Bluetooth plantar-temperature sensors and balance pods to high-risk patients. When data streams show asymmetric loading, nurses can intervene before skin breakdown occurs. Physical therapists then roll patients into ankle proprioception drills and single-leg strengthening, taking advantage of newly restored sensation to rebuild protective reflexes.",
+      "Coverage is improving but still hinges on meticulous documentation. UnitedHealthcare now authorises TNS after failure of at least two medication classes, provided podiatrists capture Semmes–Weinstein monofilament staging and glycaemic trends in the chart. Blue Cross Blue Shield sponsors a state-wide registry that tracks pain relief, ulcer incidence, and falls for patients implanted with PNIs. Practices that submit outcomes gain streamlined prior authorisations and, in some cases, device rebates.",
+      "Education remains crucial. The Florida Podiatric Medical Association added hands-on neuromodulation labs to its annual meeting so clinicians can practise lead placement, waveform tuning, and troubleshooting signal drift. Endocrinologists and wound-care physicians are also joining consults to ensure blood sugar, footwear, and vascular status support the neuromodulation plan. Patients appreciate that the strategy treats root-cause nerve signalling rather than masking symptoms.",
+      "Over the next year, expect to see neuromodulation blended with behavioural coaching. Cleveland Clinic Florida is piloting virtual visits where psychologists help patients cope with the anxiety that often accompanies chronic neuropathic pain, while podiatrists adjust stimulation parameters in real time. Early reports suggest the hybrid model keeps adherence above 80 percent—a critical threshold if neuromodulation is to fulfil its promise of reducing amputations statewide."
+    ]
+  },
+  {
+    "id": "regenerative-biologics-limb-preservation",
+    "title": "Regenerative biologics strengthen Florida’s limb-preservation playbooks",
+    "date": "2025-04-01",
+    "readTime": 8,
+    "heroImage": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=1400&q=80",
+    "excerpt": "Combination amniotic grafts, collagen scaffolds, and smart dressings are helping Florida limb-preservation teams heal recalcitrant ulcers and tendon damage.",
+    "seoDescription": "Florida limb-preservation programs describe how amniotic grafts, collagen scaffolds, and smart dressings improve chronic ulcer and tendon repair outcomes.",
+    "tags": ["Biologics", "Wound Care", "Limb Preservation"],
+    "body": [
+      "Limb-preservation teams from Miami to Pensacola are refining combined biologic protocols that heal stubborn ulcers and tendon damage faster than traditional care. A March 2025 International Wound Journal update followed 312 Floridians who received dehydrated amniotic membrane overlays plus adipose-derived stem-cell injections for recalcitrant heel and ankle ulcers. Sixty-four percent achieved full epithelialisation within 12 weeks—nearly double historical controls—and hospital admissions for infection dropped accordingly.",
+      "Podiatric surgeons are also inserting bio-inductive collagen scaffolds during revision Achilles repairs or chronic plantar fascia ruptures. Tampa General’s ultrasound follow-up shows organised tendon fibres by week eight, allowing earlier transition from immobilisation to progressive strengthening. Athletes treated at South Florida sports medicine centres report higher Foot and Ankle Ability Measure scores and quicker returns to running when collagen scaffolds are paired with platelet-rich plasma boosters.",
+      "Because these materials are costly, reimbursement strategy matters. Medicare’s local coverage determination now recognises amniotic allografts for diabetic foot ulcers after four weeks of standard therapy, but podiatrists must document perfusion with transcutaneous oxygen or duplex ultrasound. Practices in Gainesville built EHR templates that prompt vascular readings, HbA1c trends, off-loading details, and infection control steps so every graft bill meets audit standards.",
+      "Multidisciplinary stewardship keeps outcomes high. Wound-care nurses coordinate negative-pressure dressings, infectious-disease physicians tailor antibiotics, and dietitians focus on protein intake (1.2–1.5 g/kg/day) to fuel collagen synthesis. When osteomyelitis is suspected, surgeons collaborate with interventional radiologists for targeted biopsies before escalating to long-term IV therapy, protecting the efficacy of advanced biologics.",
+      "Looking forward, Florida startups are trialling smart dressings with embedded sensors that monitor moisture, pH, and pressure. The plan is to integrate that telemetry with clinic dashboards so teams can see in near-real time whether a regenerative therapy is thriving or needs backup. With coordinated documentation, clear patient education, and growing insurer trust, biologics are transitioning from “last resort” status to a standard limb-salvage pillar."
+    ]
+  }
+]
