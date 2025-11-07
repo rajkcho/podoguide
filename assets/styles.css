@@ -7,6 +7,7 @@ a:hover,a:focus-visible{text-decoration:underline}
 .skip{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
 .skip:focus{left:var(--space-4);top:var(--space-4);width:auto;height:auto;background:#fff;padding:var(--space-2);border:1px solid var(--border);z-index:1000}
 .container{max-width:72rem;margin:0 auto;padding:0 var(--space-4)}
+.container-wide{max-width:90rem}
 .stack{display:flex;flex-direction:column;gap:var(--space-6)}
 .card{background:#fff;border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--space-6)}
 .muted{color:var(--muted)}
@@ -53,7 +54,7 @@ p{margin:0 0 var(--space-3) 0}
 .ad{border:1px dashed var(--border);border-radius:var(--r);background:#f8fafc;color:var(--muted);display:flex;align-items:center;justify-content:center;margin:var(--space-4) auto;max-width:728px;width:100%;height:90px}
 @media(max-width:760px){.ad{max-width:320px;height:100px}}
 .florida-map{position:relative}
-.florida-map svg{width:100%;max-width:1100px;margin:0 auto var(--space-2)}
+.florida-map svg{width:100%;max-width:1200px;margin:0 auto var(--space-2)}
 .florida-map .state{fill:#dbeafe;stroke:#2563eb;stroke-width:.9}
 .florida-map .city{fill:#0a66c2;opacity:.9}
 .florida-map .city:hover{opacity:1}
