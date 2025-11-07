@@ -133,7 +133,37 @@ function initNavToggle(){
   toggle.addEventListener('click', toggleNav);
 }
 
+function initMapTooltip(){
+  const tooltip = document.getElementById('map-tooltip');
+  const map = document.querySelector('.florida-map');
+  if(!tooltip || !map) return;
+  const links = map.querySelectorAll('a[data-city][data-count]');
+  if(!links.length) return;
+  const hide = ()=>{ tooltip.style.opacity = '0'; };
+  const show = (evt, link)=>{
+    const circle = link.querySelector('circle');
+    if(!circle) return;
+    const mapRect = map.getBoundingClientRect();
+    const circleRect = circle.getBoundingClientRect();
+    const x = circleRect.left + circleRect.width/2 - mapRect.left;
+    const y = circleRect.top - mapRect.top;
+    tooltip.textContent = `${link.getAttribute('data-city')} — ${link.getAttribute('data-count')}`;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = y + 'px';
+    tooltip.style.opacity = '1';
+  };
+  links.forEach(link=>{
+    const enter = evt=>show(evt, link);
+    const leave = hide;
+    link.addEventListener('mouseenter', enter);
+    link.addEventListener('mouseleave', leave);
+    link.addEventListener('focus', enter);
+    link.addEventListener('blur', leave);
+  });
+}
+
 document.addEventListener('DOMContentLoaded', ()=>{
   initNavToggle();
+  initMapTooltip();
   loadGoogleReviews();
 });

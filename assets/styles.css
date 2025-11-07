@@ -52,14 +52,19 @@ p{margin:0 0 var(--space-3) 0}
 .guide-nav .btn{width:100%;justify-content:center}
 .ad{border:1px dashed var(--border);border-radius:var(--r);background:#f8fafc;color:var(--muted);display:flex;align-items:center;justify-content:center;margin:var(--space-4) auto;max-width:728px;width:100%;height:90px}
 @media(max-width:760px){.ad{max-width:320px;height:100px}}
+.florida-map{position:relative}
 .florida-map svg{width:100%;max-width:780px;margin:0 auto var(--space-2)}
 .florida-map .state{fill:#dbeafe;stroke:#2563eb;stroke-width:.9}
 .florida-map .city{fill:#0a66c2;opacity:.9}
 .florida-map .city:hover{opacity:1}
 .florida-map a circle{cursor:pointer}
-.florida-map text{fill:#1e3a8a;font-weight:600;font-size:1.25rem;text-anchor:middle}
+.florida-map text:not(.city-label){fill:#1e3a8a;font-weight:600;font-size:1.25rem;text-anchor:middle}
 .city-label{fill:#0f172a;font-size:12px;pointer-events:none}
-.tooltip{
+.popular-searches{gap:var(--space-3);padding-top:var(--space-6)}
+.popular-searches h2{margin-bottom:var(--space-2)}
+.popular-searches .florida-map{margin:0 auto;border:0;padding:0;background:transparent}
+.popular-searches .florida-map svg{margin:0 auto}
+.map-tooltip{
   position:absolute;
   transform:translate(-50%,-120%);
   background:#fff;
@@ -71,6 +76,8 @@ p{margin:0 0 var(--space-3) 0}
   pointer-events:none;
   opacity:0;
   transition:opacity .15s ease;
+  left:0;
+  top:0;
 }
 .list-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-2);padding:var(--space-3);border:1px solid var(--border);border-radius:var(--r);background:#fff;box-shadow:var(--shadow)}
 .list-row .sub{color:var(--muted);font-size:.95rem}
