@@ -56,7 +56,7 @@ function renderArticle(articles){
   const author = document.createElement('div');
   author.className = 'author-card';
   author.innerHTML = `
-    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=320&q=80" alt="Portrait of Mary Voight, DPM — blonde woman in her 30s with bold lipstick and modern glasses"/>
+    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=320&q=80" alt="Portrait of Mary Voight, DPM — blonde woman in her 30s with bold lipstick and modern glasses" width="64" height="64"/>
     <div>
       <strong>Mary Voight, DPM</strong>
       <span class="meta">Clinical editor &amp; podiatric surgeon</span>
