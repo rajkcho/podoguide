@@ -133,64 +133,98 @@ function initNavToggle(){
   toggle.addEventListener('click', toggleNav);
 }
 
-function initMapTooltip(){
-  document.querySelectorAll('.florida-map').forEach(map=>{
-    const tooltip = map.querySelector('.map-tooltip');
-    if(!tooltip) return;
-    const markers = map.querySelectorAll('a[data-city][data-count]');
-    if(!markers.length) return;
-    const hide = ()=>{ tooltip.style.opacity = '0'; };
-    const positionTooltip = (clientX, clientY)=>{
-      const mapRect = map.getBoundingClientRect();
-      let x = clientX - mapRect.left;
-      let y = clientY - mapRect.top - 12;
-      x = Math.max(12, Math.min(mapRect.width - 12, x));
-      y = Math.max(12, Math.min(mapRect.height - 12, y));
-      tooltip.style.left = x + 'px';
-      tooltip.style.top = y + 'px';
-    };
-    const circleCenter = marker=>{
-      const circle = marker.querySelector('circle');
-      if(!circle) return null;
-      const rect = circle.getBoundingClientRect();
-      return {x: rect.left + rect.width/2, y: rect.top};
-    };
-    markers.forEach(marker=>{
-      const show = evt=>{
-        tooltip.textContent = `${marker.getAttribute('data-city')} — ${marker.getAttribute('data-count')}`;
-        tooltip.style.opacity = '1';
-        if(evt){
-          if(evt.touches && evt.touches[0]){
-            positionTooltip(evt.touches[0].clientX, evt.touches[0].clientY);
-            return;
+function initLeafletMap(){
+  const mapEl = document.getElementById('popular-map');
+  if(!mapEl || typeof L==='undefined') return;
+
+  const map = L.map(mapEl, {
+    zoomControl:true,
+    scrollWheelZoom:false,
+    attributionControl:true
+  });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom:18,
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  const enableWheel = ()=>map.scrollWheelZoom.enable();
+  const disableWheel = ()=>map.scrollWheelZoom.disable();
+  disableWheel();
+  mapEl.addEventListener('mouseenter', enableWheel);
+  mapEl.addEventListener('mouseleave', disableWheel);
+  mapEl.addEventListener('focusin', enableWheel);
+  mapEl.addEventListener('focusout', disableWheel);
+
+  const cities = [
+    {name:'Miami', coords:[25.7617,-80.1918], count:5022, url:'/podoguide/podiatrists/fl/miami/'},
+    {name:'Orlando', coords:[28.5383,-81.3792], count:4216, url:'/podoguide/podiatrists/fl/orlando/'},
+    {name:'Jacksonville', coords:[30.3322,-81.6557], count:4155, url:'/podoguide/podiatrists/fl/jacksonville/'},
+    {name:'Tampa', coords:[27.9506,-82.4572], count:3695, url:'/podoguide/podiatrists/fl/tampa/'},
+    {name:'Gainesville', coords:[29.6516,-82.3248], count:1695, url:'/podoguide/podiatrists/fl/gainesville/'},
+    {name:'Fort Myers', coords:[26.6406,-81.8723], count:1584, url:'/podoguide/podiatrists/fl/fort-myers/'},
+    {name:'Melbourne', coords:[28.0836,-80.6081], count:1058, url:'/podoguide/podiatrists/fl/melbourne/'},
+    {name:'St. Petersburg', coords:[27.7676,-82.6403], count:943, url:'/podoguide/podiatrists/fl/st-petersburg/'},
+    {name:'Pensacola', coords:[30.4213,-87.2169], count:934, url:'/podoguide/podiatrists/fl/pensacola/'},
+    {name:'Kissimmee', coords:[28.2919,-81.4073], count:924, url:'/podoguide/podiatrists/fl/kissimmee/'}
+  ];
+
+  const cityBounds = L.latLngBounds(cities.map(city=>city.coords));
+
+  cities.forEach(city=>{
+    const countLabel = city.count.toLocaleString();
+    const marker = L.circleMarker(city.coords, {
+      radius:6,
+      color:'#0a66c2',
+      weight:2,
+      fillColor:'#0a66c2',
+      fillOpacity:.85,
+      className:'city-marker'
+    }).addTo(map);
+
+    marker.bindTooltip(
+      `<strong>${city.name}</strong><span>${countLabel} podiatrists</span><a href="${city.url}">View city</a>`,
+      {direction:'top',offset:[0,-6],sticky:true,opacity:.95,className:'city-tooltip'}
+    );
+
+    marker.on('click', ()=>{ window.location.href = city.url; });
+    marker.on('add', ()=>{
+      const el = marker.getElement();
+      if(el){
+        el.setAttribute('tabindex','0');
+        el.setAttribute('role','link');
+        el.setAttribute('aria-label', `${city.name} — ${countLabel} podiatrists. View city profile.`);
+        el.addEventListener('keydown', evt=>{
+          if(evt.key === 'Enter' || evt.key === ' '){
+            evt.preventDefault();
+            window.location.href = city.url;
           }
-          if(typeof evt.clientX === 'number'){
-            positionTooltip(evt.clientX, evt.clientY);
-            return;
-          }
-        }
-        const center = circleCenter(marker);
-        if(center) positionTooltip(center.x, center.y);
-      };
-      const move = evt=>{
-        if(evt.touches && evt.touches[0]){
-          positionTooltip(evt.touches[0].clientX, evt.touches[0].clientY);
-        }else if(typeof evt.clientX === 'number'){
-          positionTooltip(evt.clientX, evt.clientY);
-        }
-      };
-      marker.addEventListener('pointerenter', show);
-      marker.addEventListener('pointermove', move);
-      marker.addEventListener('pointerleave', hide);
-      marker.addEventListener('pointercancel', hide);
-      marker.addEventListener('focus', show);
-      marker.addEventListener('blur', hide);
+        });
+      }
     });
   });
+
+  map.fitBounds(cityBounds.pad(0.2));
+
+  fetch('/podoguide/assets/florida-boundary.geojson')
+    .then(resp=>resp.ok ? resp.json() : null)
+    .then(data=>{
+      if(!data) return;
+      const boundary = L.geoJSON(data, {
+        style:{
+          color:'#2563eb',
+          weight:1.5,
+          fillColor:'#dbeafe',
+          fillOpacity:.35
+        }
+      }).addTo(map);
+      map.fitBounds(boundary.getBounds(), {padding:[12,12]});
+    })
+    .catch(()=>{});
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
   initNavToggle();
-  initMapTooltip();
+  initLeafletMap();
   loadGoogleReviews();
 });

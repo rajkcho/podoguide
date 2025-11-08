@@ -6,7 +6,9 @@
 <link rel="canonical" href="https://rajkcho.github.io/podoguide/"/>
 <title>Florida Podiatrists & Foot Specialists | PodoGuide</title>
 <meta name="description" content="Search trusted Florida podiatrists by city, compare treatments, and read expert insights across 6,300+ specialists statewide."/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-o9N1j7kGStpU8wEfr2E1VlzDqrs+0hGNsMch0P0i94c=" crossorigin="anonymous"/>
 <link rel="stylesheet" href="/podoguide/assets/site.css"/>
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1j7kGStpU8wEfr2E1VlzDqrs+0hGNsMch0P0i94c=" crossorigin="anonymous"></script>
 <script defer src="/podoguide/assets/site.js"></script>
 <script defer src="/podoguide/assets/insights.js"></script>
 <script type="application/ld+json">
@@ -82,72 +84,7 @@
   <section class="container stack popular-searches" aria-label="Popular searches map">
       <h2>Popular searches</h2>
       <div class="florida-map">
-<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink="http://www.w3.org/1999/xlink" viewBox='0 0 728 300' role='img' aria-labelledby='popular-map-title'>
-  <title id='popular-map-title'>Top Florida podiatry cities</title>
-  <path class='state' d='M62.4 78.75 L65.87 68.44 L107.47 61.88 L246.13 57.19 L364 46.88 L433.33 49.69 L530.4 58.12 L589.33 70.31 L624 88.12 L617.07 103.12 L655.2 119.06 L679.47 140.62 L672.53 155.62 L696.8 168.75 L689.87 181.88 L710.67 196.88 L689.87 210.94 L676 227.81 L641.33 247.5 L610.13 263.44 L582.4 271.88 L540.8 276.56 L502.67 273.75 L464.53 260.62 L426.4 240 L391.73 219.38 L346.67 196.88 L308.53 177.19 L263.47 154.69 L221.87 133.12 L180.27 111.56 L145.6 98.44 L104 88.12 Z'/>
-  <text class='state-label' x='365' y='165'>Florida</text>
-  <g class='city-point'>
-    <a xlink:href="/podoguide/podiatrists/fl/miami/" aria-label="Miami, FL" data-city="Miami" data-count="5,022 podiatrists">
-      <circle class='city' cx='533.87' cy='243.75' r='5'><title>Miami — 5,022 podiatrists</title></circle>
-    </a>
-    <text class='city-label' x='547' y='235'>Miami</text>
-  </g>
-  <g class='city-point'>
-    <a xlink:href="/podoguide/podiatrists/fl/orlando/" aria-label="Orlando, FL" data-city="Orlando" data-count="4,216 podiatrists">
-      <circle class='city' cx='390' cy='154.69' r='5'><title>Orlando — 4,216 podiatrists</title></circle>
-    </a>
-    <text class='city-label' x='403' y='146'>Orlando</text>
-  </g>
-  <g class='city-point'>
-    <a xlink:href="/podoguide/podiatrists/fl/jacksonville/" aria-label="Jacksonville, FL" data-city="Jacksonville" data-count="4,155 podiatrists">
-      <circle class='city' cx='442' cy='98.44' r='5'><title>Jacksonville — 4,155 podiatrists</title></circle>
-    </a>
-    <text class='city-label' x='456' y='88'>Jacksonville</text>
-  </g>
-  <g class='city-point'>
-    <a xlink:href="/podoguide/podiatrists/fl/tampa/" aria-label="Tampa, FL" data-city="Tampa" data-count="3,695 podiatrists">
-      <circle class='city' cx='303.33' cy='173.44' r='5'><title>Tampa — 3,695 podiatrists</title></circle>
-    </a>
-    <text class='city-label' x='317' y='163'>Tampa</text>
-  </g>
-  <g class='city-point'>
-    <a xlink:href="/podoguide/podiatrists/fl/gainesville/" aria-label="Gainesville, FL" data-city="Gainesville" data-count="1,695 podiatrists">
-      <circle class='city' cx='372.67' cy='124.22' r='5'><title>Gainesville — 1,695 podiatrists</title></circle>
-    </a>
-    <text class='city-label' x='386' y='114'>Gainesville</text>
-  </g>
-  <g class='city-point'>
-    <a xlink:href="/podoguide/podiatrists/fl/fort-myers/" aria-label="Fort Myers, FL" data-city="Fort Myers" data-count="1,584 podiatrists">
-      <circle class='city' cx='372.67' cy='201.56' r='5'><title>Fort Myers — 1,584 podiatrists</title></circle>
-    </a>
-    <text class='city-label' x='386' y='191'>Fort Myers</text>
-  </g>
-  <g class='city-point'>
-    <a xlink:href="/podoguide/podiatrists/fl/melbourne/" aria-label="Melbourne, FL" data-city="Melbourne" data-count="1,058 podiatrists">
-      <circle class='city' cx='476.67' cy='189.84' r='5'><title>Melbourne — 1,058 podiatrists</title></circle>
-    </a>
-    <text class='city-label' x='490' y='179'>Melbourne</text>
-  </g>
-  <g class='city-point'>
-    <a xlink:href="/podoguide/podiatrists/fl/st-petersburg/" aria-label="St. Petersburg, FL" data-city="St. Petersburg" data-count="943 podiatrists">
-      <circle class='city' cx='291.2' cy='180.47' r='5'><title>St. Petersburg — 943 podiatrists</title></circle>
-    </a>
-    <text class='city-label' x='305' y='170'>St. Petersburg</text>
-  </g>
-  <g class='city-point'>
-    <a xlink:href="/podoguide/podiatrists/fl/pensacola/" aria-label="Pensacola, FL" data-city="Pensacola" data-count="934 podiatrists">
-      <circle class='city' cx='190.67' cy='84.38' r='5'><title>Pensacola — 934 podiatrists</title></circle>
-    </a>
-    <text class='city-label' x='204' y='74'>Pensacola</text>
-  </g>
-  <g class='city-point'>
-    <a xlink:href="/podoguide/podiatrists/fl/kissimmee/" aria-label="Kissimmee, FL" data-city="Kissimmee" data-count="924 podiatrists">
-      <circle class='city' cx='395.2' cy='158.44' r='5'><title>Kissimmee — 924 podiatrists</title></circle>
-    </a>
-    <text class='city-label' x='409' y='148'>Kissimmee</text>
-  </g>
-</svg>
-        <div class="map-tooltip" id="map-tooltip" role="status" aria-live="polite"></div>
+        <div id="popular-map" class="leaflet-map" role="region" aria-label="Top Florida podiatry cities map" tabindex="0"></div>
       </div>
   </section>
   <section class="container plan-visit stack">
