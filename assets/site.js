@@ -677,9 +677,7 @@ function createDoctorCard(sourceNode, cityName, index){
 function createHeroCard(headingText, totalTracked, pageCopy, updatedCopy, cityName, photoMeta){
   const hero = document.createElement('section');
   hero.className = 'card city-hero-card';
-  hero.appendChild(createCityHeroMedia(photoMeta, cityName));
-  const body = document.createElement('div');
-  body.className = 'city-hero-body';
+  const { media, overlay } = createCityHeroMedia(photoMeta, cityName);
   const content = document.createElement('div');
   content.className = 'city-hero-content';
   const eyebrow = document.createElement('p');
@@ -697,7 +695,6 @@ function createHeroCard(headingText, totalTracked, pageCopy, updatedCopy, cityNa
   content.appendChild(title);
   content.appendChild(stats);
   content.appendChild(metaLine);
-  body.appendChild(content);
   const ctaWrap = document.createElement('div');
   ctaWrap.className = 'hero-cta';
   const primaryCta = document.createElement('a');
@@ -710,8 +707,9 @@ function createHeroCard(headingText, totalTracked, pageCopy, updatedCopy, cityNa
   secondaryCta.textContent = 'Explore treatments';
   ctaWrap.appendChild(primaryCta);
   ctaWrap.appendChild(secondaryCta);
-  body.appendChild(ctaWrap);
-  hero.appendChild(body);
+  overlay.appendChild(content);
+  overlay.appendChild(ctaWrap);
+  hero.appendChild(media);
   return hero;
 }
 
@@ -729,6 +727,9 @@ function createCityHeroMedia(photoMeta, cityName){
   img.loading = 'eager';
   img.decoding = 'async';
   media.appendChild(img);
+  const overlay = document.createElement('div');
+  overlay.className = 'city-hero-overlay';
+  media.appendChild(overlay);
   if(photoMeta && photoMeta.credit && photoMeta.credit.photographer){
     const credit = document.createElement('figcaption');
     credit.className = 'meta';
@@ -746,7 +747,7 @@ function createCityHeroMedia(photoMeta, cityName){
     }
     media.appendChild(credit);
   }
-  return media;
+  return { media, overlay };
 }
 
 function buildOptions(options){
