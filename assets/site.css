@@ -52,21 +52,21 @@
   position:absolute;
   inset:0;
   display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  padding:var(--space-4);
+  align-items:flex-end;
+  justify-content:flex-start;
+  text-align:left;
+  padding:var(--space-4) var(--space-6);
   color:#fff;
   z-index:2;
 }
 .city-hero-overlay h1{
-  margin:0;
+  margin:0 0 var(--space-2);
   font-size:clamp(1.2rem,4vw,2rem);
   text-transform:none;
   letter-spacing:.02em;
 }
 .hero-count{
-  margin:var(--space-2) 0 0;
+  margin:0;
   font-size:1rem;
   font-weight:600;
   color:#fff;
