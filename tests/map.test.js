@@ -122,9 +122,9 @@ it('initializes Leaflet with the popular map element', async () => {
   expect(targetEl.id).toBe('popular-map');
 });
 
-it('plots the top 20 city markers with tooltips', async () => {
+it('plots the top 30 city markers with tooltips', async () => {
   initLeafletMap();
-  expect(circleMarkerMock).toHaveBeenCalledTimes(20);
+  expect(circleMarkerMock).toHaveBeenCalledTimes(30);
 });
 
 it('fetches the Florida boundary GeoJSON and fits bounds', async () => {

@@ -104,7 +104,17 @@ const topFloridaCities = [
   {name:'Melbourne', coords:[28.0836,-80.6081], count:1058, url:'/podoguide/podiatrists/fl/melbourne/'},
   {name:'Pensacola', coords:[30.4213,-87.2169], count:934, url:'/podoguide/podiatrists/fl/pensacola/'},
   {name:'Kissimmee', coords:[28.2919,-81.4073], count:924, url:'/podoguide/podiatrists/fl/kissimmee/'},
-  {name:'Naples', coords:[26.142,-81.7948], count:902, url:'/podoguide/podiatrists/fl/naples/'}
+  {name:'Naples', coords:[26.142,-81.7948], count:902, url:'/podoguide/podiatrists/fl/naples/'},
+  {name:'Hollywood', coords:[26.0112,-80.1495], count:1185, url:'/podoguide/podiatrists/fl/hollywood/'},
+  {name:'Coral Springs', coords:[26.2712,-80.2706], count:1012, url:'/podoguide/podiatrists/fl/coral-springs/'},
+  {name:'Miami Gardens', coords:[25.942,-80.2456], count:975, url:'/podoguide/podiatrists/fl/miami-gardens/'},
+  {name:'Clearwater', coords:[27.9659,-82.8001], count:950, url:'/podoguide/podiatrists/fl/clearwater/'},
+  {name:'Lakeland', coords:[28.0395,-81.9498], count:928, url:'/podoguide/podiatrists/fl/lakeland/'},
+  {name:'Deltona', coords:[28.9005,-81.2637], count:912, url:'/podoguide/podiatrists/fl/deltona/'},
+  {name:'Pembroke Pines', coords:[26.0078,-80.2963], count:905, url:'/podoguide/podiatrists/fl/pembroke-pines/'},
+  {name:'Davie', coords:[26.0765,-80.2521], count:898, url:'/podoguide/podiatrists/fl/davie/'},
+  {name:'Pompano Beach', coords:[26.2379,-80.1248], count:890, url:'/podoguide/podiatrists/fl/pompano-beach/'},
+  {name:'Bradenton', coords:[27.4989,-82.5748], count:882, url:'/podoguide/podiatrists/fl/bradenton/'}
 ];
 const zipCache = {};
 async function zipToLatLng(zip){
