@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "photos": "node scripts/fetch-city-photos.js"
   },
   "repository": {
     "type": "git",

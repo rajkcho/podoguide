@@ -392,6 +392,62 @@ const treatmentLinks = [
 ];
 
 const insightsEndpoint = '/podoguide/insights/articles.json';
+const CITY_PHOTO_PREFIX = '/podoguide/img/city-photos/';
+const FALLBACK_CITY_PHOTO = '/podoguide/assets/hero-florida.jpg';
+let cityPhotoManifestCache = null;
+let cityPhotoManifestPromise = null;
+
+function loadCityPhotoManifest(){
+  if(cityPhotoManifestCache) return Promise.resolve(cityPhotoManifestCache);
+  if(cityPhotoManifestPromise) return cityPhotoManifestPromise;
+  if(!hasDocument || typeof fetch === 'undefined'){
+    cityPhotoManifestCache = {};
+    return Promise.resolve(cityPhotoManifestCache);
+  }
+  cityPhotoManifestPromise = fetch(getAssetUrl('city-photos.json'), {cache:'no-cache'})
+    .then(resp=>resp && resp.ok ? resp.json() : [])
+    .then(entries=>{
+      const map = {};
+      (entries||[]).forEach(entry=>{
+        if(entry && entry.slug){
+          map[entry.slug] = entry;
+        }
+      });
+      cityPhotoManifestCache = map;
+      return map;
+    })
+    .catch(err=>{
+      console.warn('City photo manifest failed to load', err);
+      cityPhotoManifestCache = {};
+      return cityPhotoManifestCache;
+    });
+  return cityPhotoManifestPromise;
+}
+
+function getCitySlugFromPath(){
+  if(!hasWindow || !window.location || !window.location.pathname) return '';
+  const segments = window.location.pathname.split('/').filter(Boolean);
+  const podIndex = segments.indexOf('podiatrists');
+  if(podIndex === -1) return '';
+  if(segments[podIndex+1] !== 'fl') return '';
+  const candidate = segments[podIndex+2];
+  return (candidate && candidate !== 'page') ? candidate : (segments[podIndex+3] && segments[podIndex+3] !== 'page' ? segments[podIndex+3] : '');
+}
+
+function slugifyCityName(name){
+  return (name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+}
+
+function synthesizeCityAlt(cityName){
+  return `${cityName||'Florida'}, Florida skyline at sunset`;
+}
+
+function getCityPhotoUrl(fileName){
+  if(fileName){
+    return `${CITY_PHOTO_PREFIX}${fileName}`;
+  }
+  return FALLBACK_CITY_PHOTO;
+}
 
 function formatNumber(value){
   if(typeof value!=='number' || isNaN(value)) return '';
@@ -618,9 +674,12 @@ function createDoctorCard(sourceNode, cityName, index){
   return card;
 }
 
-function createHeroCard(headingText, totalTracked, pageCopy, updatedCopy){
+function createHeroCard(headingText, totalTracked, pageCopy, updatedCopy, cityName, photoMeta){
   const hero = document.createElement('section');
   hero.className = 'card city-hero-card';
+  hero.appendChild(createCityHeroMedia(photoMeta, cityName));
+  const body = document.createElement('div');
+  body.className = 'city-hero-body';
   const content = document.createElement('div');
   content.className = 'city-hero-content';
   const eyebrow = document.createElement('p');
@@ -638,7 +697,7 @@ function createHeroCard(headingText, totalTracked, pageCopy, updatedCopy){
   content.appendChild(title);
   content.appendChild(stats);
   content.appendChild(metaLine);
-  hero.appendChild(content);
+  body.appendChild(content);
   const ctaWrap = document.createElement('div');
   ctaWrap.className = 'hero-cta';
   const primaryCta = document.createElement('a');
@@ -651,8 +710,43 @@ function createHeroCard(headingText, totalTracked, pageCopy, updatedCopy){
   secondaryCta.textContent = 'Explore treatments';
   ctaWrap.appendChild(primaryCta);
   ctaWrap.appendChild(secondaryCta);
-  hero.appendChild(ctaWrap);
+  body.appendChild(ctaWrap);
+  hero.appendChild(body);
   return hero;
+}
+
+function createCityHeroMedia(photoMeta, cityName){
+  const media = document.createElement('figure');
+  media.className = 'city-hero-media';
+  const img = document.createElement('img');
+  const width = photoMeta && Number(photoMeta.width) ? Number(photoMeta.width) : 1200;
+  const height = photoMeta && Number(photoMeta.height) ? Number(photoMeta.height) : 800;
+  const altText = (photoMeta && photoMeta.alt) || synthesizeCityAlt(cityName);
+  img.src = getCityPhotoUrl(photoMeta && photoMeta.file);
+  img.alt = altText;
+  img.width = width;
+  img.height = height;
+  img.loading = 'eager';
+  img.decoding = 'async';
+  media.appendChild(img);
+  if(photoMeta && photoMeta.credit && photoMeta.credit.photographer){
+    const credit = document.createElement('figcaption');
+    credit.className = 'meta';
+    credit.textContent = 'Photo: ';
+    if(photoMeta.credit.url){
+      const link = document.createElement('a');
+      link.href = photoMeta.credit.url;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = `${photoMeta.credit.photographer} via Pexels`;
+      credit.appendChild(link);
+    }else{
+      const textNode = document.createTextNode(`${photoMeta.credit.photographer} via Pexels`);
+      credit.appendChild(textNode);
+    }
+    media.appendChild(credit);
+  }
+  return media;
 }
 
 function buildOptions(options){
@@ -891,7 +985,7 @@ function initCityFilters(grid, totalTracked){
   apply();
 }
 
-function initCityDirectoryPage(){
+async function initCityDirectoryPage(){
   if(!hasDocument) return;
   const container = document.querySelector('main .container');
   if(!container) return;
@@ -903,6 +997,7 @@ function initCityDirectoryPage(){
   const cityCountEl = container.querySelector('.city-count');
   const stats = parseCityStats(cityCountEl ? cityCountEl.textContent : '');
   const updatedCopy = getUpdatedCopy();
+  const citySlug = getCitySlugFromPath() || slugifyCityName(cityName);
   const stickySearch = container.querySelector('.sticky-search');
   if(stickySearch) stickySearch.remove();
   if(headingEl) headingEl.remove();
@@ -931,7 +1026,14 @@ function initCityDirectoryPage(){
   layout.appendChild(rail);
   container.appendChild(layout);
   const totalTracked = stats.total || doctorCards.length;
-  mainCol.appendChild(createHeroCard(headingText || `Podiatrists in ${cityName}, FL`, totalTracked, stats.pageCopy, updatedCopy));
+  let cityPhoto = null;
+  try{
+    const manifest = await loadCityPhotoManifest();
+    cityPhoto = manifest[citySlug] || null;
+  }catch(err){
+    cityPhoto = null;
+  }
+  mainCol.appendChild(createHeroCard(headingText || `Podiatrists in ${cityName}, FL`, totalTracked, stats.pageCopy, updatedCopy, cityName, cityPhoto));
   mainCol.appendChild(createFilterBar(doctorCards.length, totalTracked));
   const listHeading = document.createElement('h2');
   listHeading.textContent = directoryHeading;
@@ -964,7 +1066,7 @@ if(hasDocument && !isTestEnv){
     initNavToggle();
     initLeafletMap();
     loadGoogleReviews();
-    initCityDirectoryPage();
+    initCityDirectoryPage().catch(err=>console.error('City directory enhancement failed', err));
   });
 }
 
