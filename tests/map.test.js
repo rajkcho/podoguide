@@ -63,6 +63,8 @@ beforeEach(() => {
     fitBounds: vi.fn(),
     scrollWheelZoom: scrollWheel,
     setMaxBounds: vi.fn(),
+    setZoom: vi.fn(),
+    getZoom: vi.fn(()=>5),
     options: {},
     createPane: vi.fn(name=>{
       panes[name] = { style:{} };
@@ -138,6 +140,8 @@ it('fetches the Florida boundary GeoJSON and fits bounds', async () => {
   expect(geoJsonOptions && geoJsonOptions.pane).toBe('fl-boundary');
   expect(panes['fl-boundary'].style.pointerEvents).toBe('none');
   expect(mapInstance.setMaxBounds).toHaveBeenCalled();
+  expect(mapInstance.setZoom).toHaveBeenCalledTimes(1);
+  expect(mapInstance.setZoom).toHaveBeenCalledWith(6);
 });
 
 it('enables scroll zoom only after pointer focus', () => {

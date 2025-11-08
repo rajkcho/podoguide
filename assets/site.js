@@ -116,6 +116,15 @@ const topFloridaCities = [
   {name:'Pompano Beach', coords:[26.2379,-80.1248], count:890, url:'/podoguide/podiatrists/fl/pompano-beach/'},
   {name:'Bradenton', coords:[27.4989,-82.5748], count:882, url:'/podoguide/podiatrists/fl/bradenton/'}
 ];
+const zoomBump = map=>{
+  if(typeof map.getZoom === 'function' && typeof map.setZoom === 'function'){
+    const current = map.getZoom();
+    if(typeof current === 'number' && !Number.isNaN(current)){
+      map.setZoom(Math.min(current + 1, 12));
+    }
+  }
+};
+
 const zipCache = {};
 async function zipToLatLng(zip){
   if(zipCache[zip]) return zipCache[zip];
@@ -315,7 +324,16 @@ function initLeafletMap(){
       });
     });
 
+    let zoomAdjusted = false;
+    const applyZoomBump = ()=>{
+      if(!zoomAdjusted){
+        zoomBump(map);
+        zoomAdjusted = true;
+      }
+    };
+
     map.fitBounds(cityBounds.pad(0.2));
+    applyZoomBump();
 
     const boundaryPane = 'fl-boundary';
     if(map.createPane && !map.getPane(boundaryPane)){
@@ -344,6 +362,7 @@ function initLeafletMap(){
         if(boundary.bringToBack) boundary.bringToBack();
         const stateBounds = boundary.getBounds();
         map.fitBounds(stateBounds, {padding:[20,20]});
+        applyZoomBump();
         if(map.setMaxBounds) map.setMaxBounds(stateBounds.pad(.05));
         if(map.options){
           map.options.maxBoundsViscosity = .9;
