@@ -14,6 +14,8 @@ let initLeafletMap;
 let circleMarkerMock;
 let mapInstance;
 let createdMarkers;
+let geoJsonOptions;
+let panes;
 
 const sampleGeoJson = {
   type: 'FeatureCollection',
@@ -60,11 +62,17 @@ beforeEach(() => {
     disable: vi.fn()
   };
 
+  panes = {};
   mapInstance = {
     fitBounds: vi.fn(),
     scrollWheelZoom: scrollWheel,
     setMaxBounds: vi.fn(),
-    options: {}
+    options: {},
+    createPane: vi.fn(name=>{
+      panes[name] = { style:{} };
+      return panes[name];
+    }),
+    getPane: vi.fn(name=>panes[name] || null)
   };
 
   createdMarkers = [];
@@ -84,6 +92,7 @@ beforeEach(() => {
     return markerApi;
   });
 
+  geoJsonOptions = null;
   global.L = {
     map: vi.fn(() => mapInstance),
     tileLayer: vi.fn(() => ({ addTo: vi.fn() })),
@@ -93,13 +102,15 @@ beforeEach(() => {
       bounds.pad = vi.fn().mockReturnValue(bounds);
       return bounds;
     },
-    geoJSON: vi.fn(() => {
+    geoJSON: vi.fn((data, options={}) => {
+      geoJsonOptions = options;
       const bounds = {
         pad: vi.fn().mockReturnThis()
       };
       return {
-        addTo: vi.fn(),
-        getBounds: vi.fn(() => bounds)
+        addTo: vi.fn().mockReturnThis(),
+        getBounds: vi.fn(() => bounds),
+        bringToBack: vi.fn()
       };
     })
   };
@@ -127,6 +138,10 @@ it('fetches the Florida boundary GeoJSON and fits bounds', async () => {
   expect(global.fetch).toHaveBeenCalledWith('/podoguide/assets/florida-boundary.geojson');
   expect(global.L.geoJSON).toHaveBeenCalled();
   expect(mapInstance.fitBounds).toHaveBeenCalled();
+  expect(geoJsonOptions && geoJsonOptions.interactive).toBe(false);
+  expect(geoJsonOptions && geoJsonOptions.pane).toBe('fl-boundary');
+  expect(panes['fl-boundary'].style.pointerEvents).toBe('none');
+  expect(mapInstance.setMaxBounds).toHaveBeenCalled();
 });
 
 it('enables scroll zoom only after pointer focus', () => {

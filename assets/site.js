@@ -32,10 +32,10 @@ const topFloridaCities = [
   {name:'Fort Myers', coords:[26.6406,-81.8723], count:1584, url:'/podoguide/podiatrists/fl/fort-myers/'},
   {name:'Sarasota', coords:[27.3364,-82.5307], count:1352, url:'/podoguide/podiatrists/fl/sarasota/'},
   {name:'Boca Raton', coords:[26.3683,-80.1289], count:1210, url:'/podoguide/podiatrists/fl/boca-raton/'},
+  {name:'Palm Bay', coords:[28.0342,-80.5887], count:1108, url:'/podoguide/podiatrists/fl/palm-bay/'},
   {name:'Melbourne', coords:[28.0836,-80.6081], count:1058, url:'/podoguide/podiatrists/fl/melbourne/'},
   {name:'Pensacola', coords:[30.4213,-87.2169], count:934, url:'/podoguide/podiatrists/fl/pensacola/'},
   {name:'Kissimmee', coords:[28.2919,-81.4073], count:924, url:'/podoguide/podiatrists/fl/kissimmee/'},
-  {name:'Clearwater', coords:[27.9659,-82.8001], count:910, url:'/podoguide/podiatrists/fl/clearwater/'},
   {name:'Naples', coords:[26.142,-81.7948], count:902, url:'/podoguide/podiatrists/fl/naples/'}
 ];
 const zipCache = {};
@@ -237,11 +237,23 @@ function initLeafletMap(){
 
   map.fitBounds(cityBounds.pad(0.2));
 
+  const boundaryPane = 'fl-boundary';
+  if(map.createPane && !map.getPane(boundaryPane)){
+    map.createPane(boundaryPane);
+    const pane = map.getPane(boundaryPane);
+    if(pane){
+      pane.style.zIndex = '350';
+      pane.style.pointerEvents = 'none';
+    }
+  }
+
   fetch('/podoguide/assets/florida-boundary.geojson')
     .then(resp=>resp.ok ? resp.json() : null)
     .then(data=>{
       if(!data) return;
       const boundary = L.geoJSON(data, {
+        interactive:false,
+        pane: boundaryPane,
         style:{
           color:'#2563eb',
           weight:1.5,
@@ -249,6 +261,7 @@ function initLeafletMap(){
           fillOpacity:.35
         }
       }).addTo(map);
+      if(boundary.bringToBack) boundary.bringToBack();
       const stateBounds = boundary.getBounds();
       map.fitBounds(stateBounds, {padding:[20,20]});
       map.setMaxBounds(stateBounds.pad(.05));
