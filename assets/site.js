@@ -16,6 +16,28 @@ const hasWindow = typeof window !== 'undefined';
 const hasDocument = typeof document !== 'undefined';
 const hasLocalStorage = typeof localStorage !== 'undefined';
 
+const topFloridaCities = [
+  {name:'Miami', coords:[25.7617,-80.1918], count:5022, url:'/podoguide/podiatrists/fl/miami/'},
+  {name:'Orlando', coords:[28.5383,-81.3792], count:4216, url:'/podoguide/podiatrists/fl/orlando/'},
+  {name:'Jacksonville', coords:[30.3322,-81.6557], count:4155, url:'/podoguide/podiatrists/fl/jacksonville/'},
+  {name:'Tampa', coords:[27.9506,-82.4572], count:3695, url:'/podoguide/podiatrists/fl/tampa/'},
+  {name:'Fort Lauderdale', coords:[26.1224,-80.1373], count:3302, url:'/podoguide/podiatrists/fl/fort-lauderdale/'},
+  {name:'Hialeah', coords:[25.8576,-80.2781], count:3005, url:'/podoguide/podiatrists/fl/hialeah/'},
+  {name:'St. Petersburg', coords:[27.7676,-82.6403], count:2912, url:'/podoguide/podiatrists/fl/st-petersburg/'},
+  {name:'Port St. Lucie', coords:[27.273,-80.3582], count:2540, url:'/podoguide/podiatrists/fl/port-st-lucie/'},
+  {name:'West Palm Beach', coords:[26.7153,-80.0534], count:2412, url:'/podoguide/podiatrists/fl/west-palm-beach/'},
+  {name:'Tallahassee', coords:[30.4383,-84.2807], count:2188, url:'/podoguide/podiatrists/fl/tallahassee/'},
+  {name:'Cape Coral', coords:[26.5629,-81.9495], count:1872, url:'/podoguide/podiatrists/fl/cape-coral/'},
+  {name:'Gainesville', coords:[29.6516,-82.3248], count:1695, url:'/podoguide/podiatrists/fl/gainesville/'},
+  {name:'Fort Myers', coords:[26.6406,-81.8723], count:1584, url:'/podoguide/podiatrists/fl/fort-myers/'},
+  {name:'Sarasota', coords:[27.3364,-82.5307], count:1352, url:'/podoguide/podiatrists/fl/sarasota/'},
+  {name:'Boca Raton', coords:[26.3683,-80.1289], count:1210, url:'/podoguide/podiatrists/fl/boca-raton/'},
+  {name:'Melbourne', coords:[28.0836,-80.6081], count:1058, url:'/podoguide/podiatrists/fl/melbourne/'},
+  {name:'Pensacola', coords:[30.4213,-87.2169], count:934, url:'/podoguide/podiatrists/fl/pensacola/'},
+  {name:'Kissimmee', coords:[28.2919,-81.4073], count:924, url:'/podoguide/podiatrists/fl/kissimmee/'},
+  {name:'Clearwater', coords:[27.9659,-82.8001], count:910, url:'/podoguide/podiatrists/fl/clearwater/'},
+  {name:'Naples', coords:[26.142,-81.7948], count:902, url:'/podoguide/podiatrists/fl/naples/'}
+];
 const zipCache = {};
 async function zipToLatLng(zip){
   if(zipCache[zip]) return zipCache[zip];
@@ -176,25 +198,12 @@ function initLeafletMap(){
     mapEl.addEventListener('focusout', disableWheel);
   }
 
-  const cities = [
-    {name:'Miami', coords:[25.7617,-80.1918], count:5022, url:'/podoguide/podiatrists/fl/miami/'},
-    {name:'Orlando', coords:[28.5383,-81.3792], count:4216, url:'/podoguide/podiatrists/fl/orlando/'},
-    {name:'Jacksonville', coords:[30.3322,-81.6557], count:4155, url:'/podoguide/podiatrists/fl/jacksonville/'},
-    {name:'Tampa', coords:[27.9506,-82.4572], count:3695, url:'/podoguide/podiatrists/fl/tampa/'},
-    {name:'Gainesville', coords:[29.6516,-82.3248], count:1695, url:'/podoguide/podiatrists/fl/gainesville/'},
-    {name:'Fort Myers', coords:[26.6406,-81.8723], count:1584, url:'/podoguide/podiatrists/fl/fort-myers/'},
-    {name:'Melbourne', coords:[28.0836,-80.6081], count:1058, url:'/podoguide/podiatrists/fl/melbourne/'},
-    {name:'St. Petersburg', coords:[27.7676,-82.6403], count:943, url:'/podoguide/podiatrists/fl/st-petersburg/'},
-    {name:'Pensacola', coords:[30.4213,-87.2169], count:934, url:'/podoguide/podiatrists/fl/pensacola/'},
-    {name:'Kissimmee', coords:[28.2919,-81.4073], count:924, url:'/podoguide/podiatrists/fl/kissimmee/'}
-  ];
+  const cityBounds = L.latLngBounds(topFloridaCities.map(city=>city.coords));
 
-  const cityBounds = L.latLngBounds(cities.map(city=>city.coords));
-
-  cities.forEach(city=>{
+  topFloridaCities.forEach(city=>{
     const countLabel = city.count.toLocaleString();
     const marker = L.circleMarker(city.coords, {
-      radius:6,
+      radius:7,
       color:'#0a66c2',
       weight:2,
       fillColor:'#0a66c2',
@@ -208,6 +217,8 @@ function initLeafletMap(){
     );
 
     marker.on('click', ()=>{ navigateTo(city.url); });
+    marker.on('mouseover', ()=>{ marker.openTooltip(); });
+    marker.on('mouseout', ()=>{ marker.closeTooltip(); });
     marker.on('add', ()=>{
       const el = marker.getElement();
       if(el){
@@ -238,7 +249,12 @@ function initLeafletMap(){
           fillOpacity:.35
         }
       }).addTo(map);
-      map.fitBounds(boundary.getBounds(), {padding:[12,12]});
+      const stateBounds = boundary.getBounds();
+      map.fitBounds(stateBounds, {padding:[20,20]});
+      map.setMaxBounds(stateBounds.pad(.05));
+      if(map.options){
+        map.options.maxBoundsViscosity = .9;
+      }
     })
     .catch(()=>{});
 }
@@ -254,5 +270,5 @@ if(hasDocument && !isTestEnv){
 }
 
 if(typeof module !== 'undefined' && module.exports){
-  module.exports = { initLeafletMap };
+  module.exports = { initLeafletMap, topFloridaCities };
 }

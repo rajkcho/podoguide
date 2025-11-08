@@ -54,12 +54,14 @@ p{margin:0 0 var(--space-3) 0}
 .ad{border:1px dashed var(--border);border-radius:var(--r);background:#f8fafc;color:var(--muted);display:flex;align-items:center;justify-content:center;margin:var(--space-4) auto;max-width:728px;width:100%;height:90px}
 @media(max-width:760px){.ad{max-width:320px;height:100px}}
 .florida-map{position:relative;width:100%}
-.popular-searches{gap:var(--space-3);padding-top:var(--space-6)}
-.popular-searches h2{margin-bottom:var(--space-2)}
-.popular-searches .florida-map{margin:0;border:0;padding:0;background:transparent;max-width:728px;width:100%}
+.popular-searches{gap:var(--space-3);padding:var(--space-6) 0;background:var(--surface)}
+.popular-searches .container{max-width:72rem;margin:0 auto;padding:0 var(--space-4)}
+.popular-searches h2{margin-bottom:0}
+.popular-searches .florida-map{margin:0;border:0;padding:0;background:transparent;width:100%}
+.popular-searches .florida-map.full-width{max-width:100%}
 .leaflet-map{
   width:100%;
-  height:300px;
+  height:420px;
   border:1px solid var(--border);
   border-radius:var(--r);
   box-shadow:var(--shadow);
@@ -67,10 +69,10 @@ p{margin:0 0 var(--space-3) 0}
   margin-bottom:var(--space-2);
 }
 @media(max-width:760px){
-  .leaflet-map{height:260px}
+  .leaflet-map{height:320px}
 }
 @media(max-width:500px){
-  .leaflet-map{height:220px}
+  .leaflet-map{height:260px}
 }
 .leaflet-container{font-family:inherit;color:var(--text)}
 .leaflet-control-container .leaflet-control{font-family:inherit;font-size:.85rem}

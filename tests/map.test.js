@@ -8,11 +8,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const require = createRequire(import.meta.url);
 const sitePath = path.resolve(__dirname, '../assets/site.js');
-const flushPromises = () => new Promise(resolve => setImmediate(resolve));
+const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
 
 let initLeafletMap;
 let circleMarkerMock;
 let mapInstance;
+let createdMarkers;
 
 const sampleGeoJson = {
   type: 'FeatureCollection',
@@ -32,6 +33,7 @@ beforeEach(() => {
   const dom = new JSDOM(`<!doctype html><html><body><div id="popular-map" class="leaflet-map"></div></body></html>`, {
     url: 'https://example.com/podoguide/'
   });
+  process.env.NODE_ENV = 'test';
   global.window = dom.window;
   global.document = dom.window.document;
   Object.defineProperty(global, 'navigator', {
@@ -60,19 +62,25 @@ beforeEach(() => {
 
   mapInstance = {
     fitBounds: vi.fn(),
-    scrollWheelZoom: scrollWheel
+    scrollWheelZoom: scrollWheel,
+    setMaxBounds: vi.fn(),
+    options: {}
   };
 
+  createdMarkers = [];
   circleMarkerMock = vi.fn(() => {
     const markerApi = {
       addTo: vi.fn().mockReturnThis(),
       bindTooltip: vi.fn().mockReturnThis(),
       on: vi.fn().mockReturnThis(),
+      openTooltip: vi.fn(),
+      closeTooltip: vi.fn(),
       getElement: vi.fn().mockReturnValue({
         setAttribute: vi.fn(),
         addEventListener: vi.fn()
       })
     };
+    createdMarkers.push(markerApi);
     return markerApi;
   });
 
@@ -85,10 +93,15 @@ beforeEach(() => {
       bounds.pad = vi.fn().mockReturnValue(bounds);
       return bounds;
     },
-    geoJSON: vi.fn(() => ({
-      addTo: vi.fn(),
-      getBounds: vi.fn(() => ({}))
-    }))
+    geoJSON: vi.fn(() => {
+      const bounds = {
+        pad: vi.fn().mockReturnThis()
+      };
+      return {
+        addTo: vi.fn(),
+        getBounds: vi.fn(() => bounds)
+      };
+    })
   };
 
   delete require.cache[require.resolve(sitePath)];
@@ -102,13 +115,14 @@ it('initializes Leaflet with the popular map element', async () => {
   expect(targetEl.id).toBe('popular-map');
 });
 
-it('plots the top 10 city markers with tooltips', async () => {
+it('plots the top 20 city markers with tooltips', async () => {
   initLeafletMap();
-  expect(circleMarkerMock).toHaveBeenCalledTimes(10);
+  expect(circleMarkerMock).toHaveBeenCalledTimes(20);
 });
 
 it('fetches the Florida boundary GeoJSON and fits bounds', async () => {
   initLeafletMap();
+  await flushPromises();
   await flushPromises();
   expect(global.fetch).toHaveBeenCalledWith('/podoguide/assets/florida-boundary.geojson');
   expect(global.L.geoJSON).toHaveBeenCalled();
@@ -122,4 +136,15 @@ it('enables scroll zoom only after pointer focus', () => {
   expect(mapInstance.scrollWheelZoom.enable).toHaveBeenCalled();
   mapEl.dispatchEvent(new window.Event('mouseleave'));
   expect(mapInstance.scrollWheelZoom.disable).toHaveBeenCalledTimes(2);
+});
+
+it('registers click and hover handlers for every marker', () => {
+  initLeafletMap();
+  createdMarkers.forEach(marker=>{
+    expect(marker.bindTooltip).toHaveBeenCalledTimes(1);
+    const events = marker.on.mock.calls.map(call=>call[0]);
+    expect(events).toContain('click');
+    expect(events).toContain('mouseover');
+    expect(events).toContain('mouseout');
+  });
 });
