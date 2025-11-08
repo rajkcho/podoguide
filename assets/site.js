@@ -12,6 +12,10 @@ function filterProviders(){
   });
 }
 
+const hasWindow = typeof window !== 'undefined';
+const hasDocument = typeof document !== 'undefined';
+const hasLocalStorage = typeof localStorage !== 'undefined';
+
 const zipCache = {};
 async function zipToLatLng(zip){
   if(zipCache[zip]) return zipCache[zip];
@@ -24,16 +28,20 @@ async function zipToLatLng(zip){
       const lat = parseFloat(place.latitude);
       const lng = parseFloat(place.longitude);
       zipCache[zip] = {lat,lng};
-      try{ localStorage.setItem('zipCache:'+zip, JSON.stringify(zipCache[zip])); }catch(e){}
+      if(hasLocalStorage){
+        try{ localStorage.setItem('zipCache:'+zip, JSON.stringify(zipCache[zip])); }catch(e){}
+      }
       return zipCache[zip];
     }
   }catch(e){}
   return null;
 }
-for(let i=0;i<localStorage.length;i++){
-  const key = localStorage.key(i);
-  if(key && key.startsWith('zipCache:')){
-    try{ zipCache[key.replace('zipCache:','')] = JSON.parse(localStorage.getItem(key)); }catch(e){}
+if(hasLocalStorage){
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(key && key.startsWith('zipCache:')){
+      try{ zipCache[key.replace('zipCache:','')] = JSON.parse(localStorage.getItem(key)); }catch(e){}
+    }
   }
 }
 function haversine(lat1,lon1,lat2,lon2){
@@ -133,6 +141,16 @@ function initNavToggle(){
   toggle.addEventListener('click', toggleNav);
 }
 
+function navigateTo(url){
+  const targetLocation = typeof globalThis !== 'undefined' && globalThis.location ? globalThis.location : null;
+  if(!targetLocation) return;
+  if(typeof targetLocation.assign === 'function'){
+    targetLocation.assign(url);
+  }else{
+    targetLocation.href = url;
+  }
+}
+
 function initLeafletMap(){
   const mapEl = document.getElementById('popular-map');
   if(!mapEl || typeof L==='undefined') return;
@@ -151,10 +169,12 @@ function initLeafletMap(){
   const enableWheel = ()=>map.scrollWheelZoom.enable();
   const disableWheel = ()=>map.scrollWheelZoom.disable();
   disableWheel();
-  mapEl.addEventListener('mouseenter', enableWheel);
-  mapEl.addEventListener('mouseleave', disableWheel);
-  mapEl.addEventListener('focusin', enableWheel);
-  mapEl.addEventListener('focusout', disableWheel);
+  if(mapEl.addEventListener){
+    mapEl.addEventListener('mouseenter', enableWheel);
+    mapEl.addEventListener('mouseleave', disableWheel);
+    mapEl.addEventListener('focusin', enableWheel);
+    mapEl.addEventListener('focusout', disableWheel);
+  }
 
   const cities = [
     {name:'Miami', coords:[25.7617,-80.1918], count:5022, url:'/podoguide/podiatrists/fl/miami/'},
@@ -187,7 +207,7 @@ function initLeafletMap(){
       {direction:'top',offset:[0,-6],sticky:true,opacity:.95,className:'city-tooltip'}
     );
 
-    marker.on('click', ()=>{ window.location.href = city.url; });
+    marker.on('click', ()=>{ navigateTo(city.url); });
     marker.on('add', ()=>{
       const el = marker.getElement();
       if(el){
@@ -197,7 +217,7 @@ function initLeafletMap(){
         el.addEventListener('keydown', evt=>{
           if(evt.key === 'Enter' || evt.key === ' '){
             evt.preventDefault();
-            window.location.href = city.url;
+            navigateTo(city.url);
           }
         });
       }
@@ -223,8 +243,16 @@ function initLeafletMap(){
     .catch(()=>{});
 }
 
-document.addEventListener('DOMContentLoaded', ()=>{
-  initNavToggle();
-  initLeafletMap();
-  loadGoogleReviews();
-});
+const isTestEnv = typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test';
+
+if(hasDocument && !isTestEnv){
+  document.addEventListener('DOMContentLoaded', ()=>{
+    initNavToggle();
+    initLeafletMap();
+    loadGoogleReviews();
+  });
+}
+
+if(typeof module !== 'undefined' && module.exports){
+  module.exports = { initLeafletMap };
+}

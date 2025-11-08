@@ -1,0 +1,25 @@
+{
+  "name": "podoguide",
+  "version": "1.0.0",
+  "description": "Static marketing site for PodoGuide.",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rajkcho/podoguide.git"
+  },
+  "keywords": [],
+  "author": "PodoGuide",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rajkcho/podoguide/issues"
+  },
+  "homepage": "https://github.com/rajkcho/podoguide#readme",
+  "devDependencies": {
+    "jsdom": "^24.0.0",
+    "vitest": "^1.6.0"
+  }
+}
