@@ -47,6 +47,43 @@ function getAssetUrl(file){
   }
 }
 
+let leafletAssetPromise=null;
+
+function ensureLeafletAssets(){
+  if(typeof L!=='undefined' || !hasDocument) return Promise.resolve();
+  if(leafletAssetPromise) return leafletAssetPromise;
+  leafletAssetPromise = new Promise((resolve,reject)=>{
+    const head = document.head || document.getElementsByTagName('head')[0];
+    if(head && !document.getElementById('leaflet-style')){
+      const css = document.createElement('link');
+      css.id = 'leaflet-style';
+      css.rel = 'stylesheet';
+      css.href = getAssetUrl('vendor/leaflet/leaflet.css');
+      css.onerror = ()=>console.error('Leaflet CSS failed to load');
+      head.appendChild(css);
+    }
+    const script = document.createElement('script');
+    script.src = getAssetUrl('vendor/leaflet/leaflet.js');
+    script.defer = true;
+    script.onload = ()=>resolve();
+    script.onerror = err=>{
+      console.error('Leaflet JS failed to load', err);
+      reject(err);
+    };
+    (head || document.body).appendChild(script);
+  }).catch(err=>{
+    console.error('Unable to load Leaflet assets', err);
+  });
+  return leafletAssetPromise;
+}
+
+function withLeaflet(callback){
+  if(typeof L!=='undefined'){ callback(); return; }
+  ensureLeafletAssets().then(()=>{
+    if(typeof L!=='undefined') callback();
+  });
+}
+
 const topFloridaCities = [
   {name:'Miami', coords:[25.7617,-80.1918], count:5022, url:'/podoguide/podiatrists/fl/miami/'},
   {name:'Orlando', coords:[28.5383,-81.3792], count:4216, url:'/podoguide/podiatrists/fl/orlando/'},
@@ -206,101 +243,106 @@ function navigateTo(url){
 
 function initLeafletMap(){
   const mapEl = document.getElementById('popular-map');
-  if(!mapEl || typeof L==='undefined') return;
+  if(!mapEl) return;
 
-  const map = L.map(mapEl, {
-    zoomControl:true,
-    scrollWheelZoom:false,
-    attributionControl:true
-  });
+  const initialize = ()=>{
+    if(typeof L==='undefined') return;
+    const map = L.map(mapEl, {
+      zoomControl:true,
+      scrollWheelZoom:false,
+      attributionControl:true
+    });
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom:18,
-    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  }).addTo(map);
-
-  const enableWheel = ()=>map.scrollWheelZoom.enable();
-  const disableWheel = ()=>map.scrollWheelZoom.disable();
-  disableWheel();
-  if(mapEl.addEventListener){
-    mapEl.addEventListener('mouseenter', enableWheel);
-    mapEl.addEventListener('mouseleave', disableWheel);
-    mapEl.addEventListener('focusin', enableWheel);
-    mapEl.addEventListener('focusout', disableWheel);
-  }
-
-  const cityBounds = L.latLngBounds(topFloridaCities.map(city=>city.coords));
-
-  topFloridaCities.forEach(city=>{
-    const countLabel = city.count.toLocaleString();
-    const marker = L.circleMarker(city.coords, {
-      radius:7,
-      color:'#0a66c2',
-      weight:2,
-      fillColor:'#0a66c2',
-      fillOpacity:.85,
-      className:'city-marker'
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom:18,
+      attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    marker.bindTooltip(
-      `<strong>${city.name}</strong><span>${countLabel} podiatrists</span><a href="${city.url}">View city</a>`,
-      {direction:'top',offset:[0,-6],sticky:true,opacity:.95,className:'city-tooltip'}
-    );
-
-    marker.on('click', ()=>{ navigateTo(city.url); });
-    marker.on('mouseover', ()=>{ marker.openTooltip(); });
-    marker.on('mouseout', ()=>{ marker.closeTooltip(); });
-    marker.on('add', ()=>{
-      const el = marker.getElement();
-      if(el){
-        el.setAttribute('tabindex','0');
-        el.setAttribute('role','link');
-        el.setAttribute('aria-label', `${city.name} — ${countLabel} podiatrists. View city profile.`);
-        el.addEventListener('keydown', evt=>{
-          if(evt.key === 'Enter' || evt.key === ' '){
-            evt.preventDefault();
-            navigateTo(city.url);
-          }
-        });
-      }
-    });
-  });
-
-  map.fitBounds(cityBounds.pad(0.2));
-
-  const boundaryPane = 'fl-boundary';
-  if(map.createPane && !map.getPane(boundaryPane)){
-    map.createPane(boundaryPane);
-    const pane = map.getPane(boundaryPane);
-    if(pane){
-      pane.style.zIndex = '350';
-      pane.style.pointerEvents = 'none';
+    const enableWheel = ()=>map.scrollWheelZoom.enable();
+    const disableWheel = ()=>map.scrollWheelZoom.disable();
+    disableWheel();
+    if(mapEl.addEventListener){
+      mapEl.addEventListener('mouseenter', enableWheel);
+      mapEl.addEventListener('mouseleave', disableWheel);
+      mapEl.addEventListener('focusin', enableWheel);
+      mapEl.addEventListener('focusout', disableWheel);
     }
-  }
 
-  fetch(getAssetUrl('florida-boundary.geojson'))
-    .then(resp=>resp.ok ? resp.json() : null)
-    .then(data=>{
-      if(!data) return;
-      const boundary = L.geoJSON(data, {
-        interactive:false,
-        pane: boundaryPane,
-        style:{
-          color:'#2563eb',
-          weight:1.5,
-          fillColor:'#dbeafe',
-          fillOpacity:.35
-        }
+    const cityBounds = L.latLngBounds(topFloridaCities.map(city=>city.coords));
+
+    topFloridaCities.forEach(city=>{
+      const countLabel = city.count.toLocaleString();
+      const marker = L.circleMarker(city.coords, {
+        radius:7,
+        color:'#0a66c2',
+        weight:2,
+        fillColor:'#0a66c2',
+        fillOpacity:.85,
+        className:'city-marker'
       }).addTo(map);
-      if(boundary.bringToBack) boundary.bringToBack();
-      const stateBounds = boundary.getBounds();
-      map.fitBounds(stateBounds, {padding:[20,20]});
-      map.setMaxBounds(stateBounds.pad(.05));
-      if(map.options){
-        map.options.maxBoundsViscosity = .9;
+
+      marker.bindTooltip(
+        `<strong>${city.name}</strong><span>${countLabel} podiatrists</span><a href="${city.url}">View city</a>`,
+        {direction:'top',offset:[0,-6],sticky:true,opacity:.95,className:'city-tooltip'}
+      );
+
+      marker.on('click', ()=>{ navigateTo(city.url); });
+      marker.on('mouseover', ()=>{ marker.openTooltip(); });
+      marker.on('mouseout', ()=>{ marker.closeTooltip(); });
+      marker.on('add', ()=>{
+        const el = marker.getElement();
+        if(el){
+          el.setAttribute('tabindex','0');
+          el.setAttribute('role','link');
+          el.setAttribute('aria-label', `${city.name} — ${countLabel} podiatrists. View city profile.`);
+          el.addEventListener('keydown', evt=>{
+            if(evt.key === 'Enter' || evt.key === ' '){
+              evt.preventDefault();
+              navigateTo(city.url);
+            }
+          });
+        }
+      });
+    });
+
+    map.fitBounds(cityBounds.pad(0.2));
+
+    const boundaryPane = 'fl-boundary';
+    if(map.createPane && !map.getPane(boundaryPane)){
+      map.createPane(boundaryPane);
+      const pane = map.getPane(boundaryPane);
+      if(pane){
+        pane.style.zIndex = '350';
+        pane.style.pointerEvents = 'none';
       }
-    })
-    .catch(()=>{});
+    }
+
+    fetch(getAssetUrl('florida-boundary.geojson'))
+      .then(resp=>resp && resp.ok ? resp.json() : null)
+      .then(data=>{
+        if(!data || typeof L==='undefined') return;
+        const boundary = L.geoJSON(data, {
+          interactive:false,
+          pane: boundaryPane,
+          style:{
+            color:'#2563eb',
+            weight:1.5,
+            fillColor:'#dbeafe',
+            fillOpacity:.35
+          }
+        }).addTo(map);
+        if(boundary.bringToBack) boundary.bringToBack();
+        const stateBounds = boundary.getBounds();
+        map.fitBounds(stateBounds, {padding:[20,20]});
+        if(map.setMaxBounds) map.setMaxBounds(stateBounds.pad(.05));
+        if(map.options){
+          map.options.maxBoundsViscosity = .9;
+        }
+      })
+      .catch(err=>console.error('Florida boundary failed to load', err));
+  };
+
+  withLeaflet(initialize);
 }
 
 const isTestEnv = typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test';
