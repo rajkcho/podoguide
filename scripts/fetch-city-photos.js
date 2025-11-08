@@ -12,6 +12,8 @@ const API_ENDPOINT = 'https://api.pexels.com/v1/search';
 const OUTPUT_DIR = path.resolve(__dirname, '../img/city-photos');
 const MANIFEST_PATH = path.resolve(__dirname, '../assets/city-photos.json');
 const HEADER = '[city-photos]';
+const MAX_RATE_RETRIES = 5;
+const BASE_RETRY_DELAY = 30000;
 
 function getArgValue(flag){
   const arg = process.argv.find(item=>item.startsWith(`${flag}=`));
@@ -56,7 +58,10 @@ function requestJson(url, headers){
       res.on('end', ()=>{
         const body = Buffer.concat(chunks).toString('utf8');
         if(res.statusCode && res.statusCode >= 400){
-          return reject(new Error(`${HEADER} Request failed for ${url} (${res.statusCode}): ${body}`));
+          const error = new Error(`${HEADER} Request failed for ${url} (${res.statusCode}): ${body}`);
+          error.status = res.statusCode;
+          error.body = body;
+          return reject(error);
         }
         try{
           resolve(JSON.parse(body));
@@ -96,6 +101,8 @@ function downloadPhoto(url, destination, redirectCount=0){
     }).on('error', reject);
   });
 }
+
+const wait = ms => new Promise(resolve=>setTimeout(resolve, ms));
 
 async function readManifest(){
   try{
@@ -145,13 +152,28 @@ async function main(){
     }
     console.log(`${HEADER} → Fetching Pexels image for ${city.name}…`);
     let response;
-    try{
-      response = await requestJson(buildSearchUrl(city.name), {
-        Authorization: apiKey,
-        Accept: 'application/json'
-      });
-    }catch(err){
-      console.error(`${HEADER} ✕ ${city.name}: ${err.message}`);
+    let attempt = 0;
+    while(attempt < MAX_RATE_RETRIES){
+      try{
+        response = await requestJson(buildSearchUrl(city.name), {
+          Authorization: apiKey,
+          Accept: 'application/json'
+        });
+        break;
+      }catch(err){
+        if(err.status === 429){
+          attempt++;
+          const delay = Math.min(BASE_RETRY_DELAY * attempt, 180000);
+          console.warn(`${HEADER} ⚠︎ Rate limit hit while fetching ${city.name}. Waiting ${(delay/1000).toFixed(0)}s before retry ${attempt}/${MAX_RATE_RETRIES}.`);
+          await wait(delay);
+          continue;
+        }
+        console.error(`${HEADER} ✕ ${city.name}: ${err.message}`);
+        response = null;
+        break;
+      }
+    }
+    if(!response){
       continue;
     }
     const photo = Array.isArray(response && response.photos) ? response.photos[0] : null;
