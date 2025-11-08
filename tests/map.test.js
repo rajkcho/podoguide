@@ -140,8 +140,7 @@ it('fetches the Florida boundary GeoJSON and fits bounds', async () => {
   expect(geoJsonOptions && geoJsonOptions.pane).toBe('fl-boundary');
   expect(panes['fl-boundary'].style.pointerEvents).toBe('none');
   expect(mapInstance.setMaxBounds).toHaveBeenCalled();
-  expect(mapInstance.setZoom).toHaveBeenCalledTimes(1);
-  expect(mapInstance.setZoom).toHaveBeenCalledWith(6);
+  expect(mapInstance.setZoom).not.toHaveBeenCalled();
 });
 
 it('enables scroll zoom only after pointer focus', () => {
