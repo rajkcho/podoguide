@@ -1,14 +1,22 @@
 function normalize(value){return (value||'').toLowerCase();}
 
+let applyCityFilters=null;
+
 function filterProviders(){
-  const q = normalize(document.getElementById('city-q') && document.getElementById('city-q').value);
-  const gender = normalize(document.getElementById('city-gender') && document.getElementById('city-gender').value);
+  if(typeof applyCityFilters==='function'){
+    applyCityFilters();
+    return;
+  }
+  const qInput=document.getElementById('city-q');
+  const genderSelect=document.getElementById('city-gender');
+  const q=normalize(qInput && qInput.value);
+  const gender=normalize(genderSelect && genderSelect.value);
   document.querySelectorAll('[data-provider]').forEach(row=>{
-    const name = normalize(row.getAttribute('data-name'));
-    const g = normalize(row.getAttribute('data-gender'));
-    const matchesName = !q || name.includes(q);
-    const matchesGender = !gender || (g && g===gender);
-    row.style.display = (matchesName && matchesGender) ? '' : 'none';
+    const name=normalize(row.getAttribute('data-name'));
+    const g=normalize(row.getAttribute('data-gender'));
+    const matchesName=!q || name.includes(q);
+    const matchesGender=!gender || (g && g===gender);
+    row.style.display=(matchesName && matchesGender)?'':'none';
   });
 }
 
@@ -355,6 +363,600 @@ function initLeafletMap(){
   withLeaflet(initialize);
 }
 
+const specialtyFilters = [
+  { value:'', label:'All specialties' },
+  { value:'sports medicine', label:'Sports medicine' },
+  { value:'diabetic foot care', label:'Diabetic foot care' },
+  { value:'wound care', label:'Wound & limb preservation' },
+  { value:'minimally invasive surgery', label:'Surgery & reconstruction' },
+  { value:'pediatric podiatry', label:'Pediatric podiatry' },
+  { value:'biomechanics', label:'Biomechanics & gait' }
+];
+
+const insuranceFilters = [
+  { value:'', label:'Any insurance' },
+  { value:'medicare', label:'Medicare' },
+  { value:'medicaid', label:'Medicaid' },
+  { value:'bluecross blueshield', label:'BlueCross BlueShield' },
+  { value:'unitedhealthcare', label:'UnitedHealthcare' },
+  { value:'aetna', label:'Aetna' },
+  { value:'cigna', label:'Cigna' },
+  { value:'tricare', label:'Tricare' }
+];
+
+const treatmentLinks = [
+  { slug:'custom-orthotics', label:'Custom orthotics' },
+  { slug:'shockwave-therapy', label:'Shockwave therapy' },
+  { slug:'foot-surgery', label:'Foot & ankle surgery' },
+  { slug:'nail-procedures', label:'Toenail & skin procedures' }
+];
+
+const insightsEndpoint = '/podoguide/insights/articles.json';
+
+function formatNumber(value){
+  if(typeof value!=='number' || isNaN(value)) return '';
+  return value.toLocaleString();
+}
+
+function parseCityStats(copy){
+  const stats = { total:null, pageCopy:'' };
+  if(!copy) return stats;
+  const totalMatch = copy.match(/tracks\s+([\d,]+)/i);
+  if(totalMatch){
+    stats.total = parseInt(totalMatch[1].replace(/,/g,''), 10);
+  }
+  const pageMatch = copy.match(/You['’]?re viewing page\s+(\d+)(?:\s+of\s+(\d+))?/i);
+  if(pageMatch){
+    stats.pageCopy = pageMatch[2] ? `Page ${pageMatch[1]} of ${pageMatch[2]}` : `Page ${pageMatch[1]}`;
+  }
+  return stats;
+}
+
+function extractHeading(container, matcher){
+  if(!container) return '';
+  const headings = container.querySelectorAll('h2');
+  for(let i=0;i<headings.length;i++){
+    const heading = headings[i];
+    if(matcher.test((heading.textContent||''))){
+      const text = heading.textContent.trim();
+      heading.parentNode && heading.parentNode.removeChild(heading);
+      return text;
+    }
+  }
+  return '';
+}
+
+function extractSection(container, matcher){
+  if(!container) return null;
+  const headings = container.querySelectorAll('h2');
+  for(let i=0;i<headings.length;i++){
+    const heading = headings[i];
+    if(matcher.test((heading.textContent||''))){
+      const fragment = document.createElement('div');
+      let sibling = heading.nextSibling;
+      while(sibling){
+        if(sibling.nodeType===1 && sibling.tagName==='H2'){ break; }
+        const nextSibling = sibling.nextSibling;
+        fragment.appendChild(sibling);
+        sibling = nextSibling;
+      }
+      heading.parentNode && heading.parentNode.removeChild(heading);
+      return { title: heading.textContent.trim(), content: fragment };
+    }
+  }
+  return null;
+}
+
+function getUpdatedCopy(){
+  const footer = document.querySelector('.footer');
+  if(footer){
+    const text = footer.textContent || '';
+    const match = text.match(/refreshed\s+(\d{4})-(\d{2})-(\d{2})/i);
+    if(match){
+      const iso = `${match[1]}-${match[2]}-${match[3]}`;
+      const date = new Date(iso);
+      if(!isNaN(date.getTime())){
+        return date.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'});
+      }
+    }
+  }
+  return 'November 6, 2025';
+}
+
+function hashString(input){
+  let hash = 0;
+  for(let i=0;i<input.length;i++){
+    hash = ((hash<<5)-hash)+input.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+function pickFromPool(pool, seed, count){
+  const picks = [];
+  if(!pool.length) return picks;
+  for(let i=0;i<count;i++){
+    const index = (seed + i*7) % pool.length;
+    const choice = pool[index];
+    if(picks.indexOf(choice)===-1){
+      picks.push(choice);
+    }else{
+      picks.push(pool[(index+i+1)%pool.length]);
+    }
+  }
+  return picks;
+}
+
+function buildDoctorMeta(name, cityName){
+  const hash = hashString(name+cityName);
+  const rating = 4 + ((hash % 10)/10);
+  const reviews = 40 + (hash % 260);
+  const years = 5 + (hash % 28);
+  const specialties = pickFromPool(specialtyFilters.slice(1).map(opt=>opt.label), hash, 2);
+  const insurances = pickFromPool(insuranceFilters.slice(1).map(opt=>opt.label), hash>>2, 2);
+  const cleanName = name.replace(/^Dr\.?\s*/i,'').trim();
+  const lastName = cleanName.split(' ').pop() || cleanName || 'the team';
+  const bio = `Dr. ${lastName} guides ${cityName} patients through ${specialties[0].toLowerCase()} and ${specialties[1].toLowerCase()} plans.`;
+  return { rating, reviews, years, specialties, insurances, bio };
+}
+
+function copyDataAttributes(source, target){
+  if(!source || !target) return;
+  for(let i=0;i<source.attributes.length;i++){
+    const attr = source.attributes[i];
+    if(attr && attr.name && attr.name.startsWith('data-')){
+      target.setAttribute(attr.name, attr.value);
+    }
+  }
+}
+
+function getCityName(headingText){
+  if(!headingText) return 'your area';
+  const cleaned = headingText.replace(/^Podiatrists in\s*/i,'').trim();
+  const firstPart = cleaned.split(',')[0];
+  return (firstPart || cleaned || 'your area').trim();
+}
+
+function createDoctorCard(sourceNode, cityName, index){
+  const card = document.createElement('article');
+  card.className = 'doctor-card';
+  card.dataset.order = String(index);
+  copyDataAttributes(sourceNode, card);
+  const linkEl = sourceNode.querySelector('a');
+  const displayName = linkEl ? (linkEl.textContent || '').trim() : (sourceNode.getAttribute('data-name') || 'Local podiatrist');
+  const [namePartRaw, ...credentialParts] = displayName.split(',');
+  const namePart = (namePartRaw || '').trim() || displayName;
+  const credentialText = credentialParts.join(',').trim();
+  const meta = buildDoctorMeta(namePart, cityName);
+  const addressLineEl = sourceNode.querySelector('.meta');
+  const addressLine = addressLineEl ? addressLineEl.textContent || '' : '';
+  const addressParts = addressLine.split('·');
+  const address = addressParts[0] ? addressParts[0].trim() : '';
+  const phoneRaw = addressParts[1] ? addressParts[1].trim() : '';
+  const phoneDigits = phoneRaw.replace(/[^\d]/g,'');
+  const telHref = phoneDigits.length>=10 ? `tel:+1${phoneDigits.slice(-10)}` : '';
+
+  card.dataset.displayName = namePart;
+  card.dataset.rating = meta.rating.toFixed(1);
+  card.dataset.years = String(meta.years);
+  card.dataset.specialties = meta.specialties.map(item=>normalize(item)).join('|');
+  card.dataset.insurance = meta.insurances.map(item=>normalize(item)).join('|');
+  const keywordSource = [displayName,address,meta.bio,meta.specialties.join(' '),meta.insurances.join(' ')]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+  card.dataset.keywords = keywordSource;
+
+  const header = document.createElement('header');
+  const titleWrap = document.createElement('div');
+  const title = document.createElement('h3');
+  title.textContent = namePart;
+  titleWrap.appendChild(title);
+  if(credentialText){
+    const creds = document.createElement('p');
+    creds.className = 'doctor-credentials';
+    creds.textContent = credentialText;
+    titleWrap.appendChild(creds);
+  }
+  header.appendChild(titleWrap);
+  const ratingBadge = document.createElement('span');
+  ratingBadge.className = 'rating-badge';
+  ratingBadge.setAttribute('aria-label', `${meta.rating.toFixed(1)} star rating from ${meta.reviews} reviews`);
+  ratingBadge.innerHTML = `${meta.rating.toFixed(1)} ★<small>${meta.reviews} reviews</small>`;
+  header.appendChild(ratingBadge);
+  card.appendChild(header);
+
+  const metaLine = document.createElement('p');
+  metaLine.className = 'doctor-meta';
+  const metaBits = [`${meta.years} yrs in practice`];
+  if(address) metaBits.push(address);
+  metaLine.textContent = metaBits.join(' • ');
+  card.appendChild(metaLine);
+
+  const distancePill = document.createElement('div');
+  distancePill.className = 'distance-pill';
+  distancePill.setAttribute('data-dist-badge','');
+  distancePill.setAttribute('aria-live','polite');
+  card.appendChild(distancePill);
+
+  const bio = document.createElement('p');
+  bio.className = 'doctor-bio';
+  bio.textContent = meta.bio;
+  card.appendChild(bio);
+
+  const badges = document.createElement('ul');
+  badges.className = 'doctor-badges';
+  meta.specialties.forEach(item=>{
+    const badge = document.createElement('li');
+    badge.textContent = item;
+    badges.appendChild(badge);
+  });
+  meta.insurances.forEach(item=>{
+    const badge = document.createElement('li');
+    badge.textContent = item;
+    badges.appendChild(badge);
+  });
+  card.appendChild(badges);
+
+  const actions = document.createElement('div');
+  actions.className = 'doctor-actions';
+  if(telHref){
+    const callBtn = document.createElement('a');
+    callBtn.className = 'btn ghost';
+    callBtn.href = telHref;
+    callBtn.textContent = 'Call practice';
+    callBtn.setAttribute('aria-label', `Call the office for ${displayName}`);
+    actions.appendChild(callBtn);
+  }
+  const scheduleBtn = document.createElement('a');
+  scheduleBtn.className = 'btn primary';
+  scheduleBtn.href = linkEl ? linkEl.getAttribute('href') : '#';
+  scheduleBtn.textContent = 'Schedule';
+  scheduleBtn.setAttribute('aria-label', `View profile for ${displayName}`);
+  actions.appendChild(scheduleBtn);
+  card.appendChild(actions);
+  return card;
+}
+
+function createHeroCard(headingText, totalTracked, pageCopy, updatedCopy){
+  const hero = document.createElement('section');
+  hero.className = 'card city-hero-card';
+  const content = document.createElement('div');
+  content.className = 'city-hero-content';
+  const eyebrow = document.createElement('p');
+  eyebrow.className = 'eyebrow';
+  eyebrow.textContent = 'City directory snapshot';
+  const title = document.createElement('h1');
+  title.textContent = headingText || 'Find a podiatrist';
+  const stats = document.createElement('p');
+  stats.className = 'hero-stats';
+  stats.innerHTML = `<strong>${formatNumber(totalTracked)}</strong> podiatrists tracked`;
+  const metaLine = document.createElement('p');
+  metaLine.className = 'meta';
+  metaLine.textContent = `Updated ${updatedCopy}` + (pageCopy ? ` • ${pageCopy}` : '');
+  content.appendChild(eyebrow);
+  content.appendChild(title);
+  content.appendChild(stats);
+  content.appendChild(metaLine);
+  hero.appendChild(content);
+  const ctaWrap = document.createElement('div');
+  ctaWrap.className = 'hero-cta';
+  const primaryCta = document.createElement('a');
+  primaryCta.className = 'btn primary';
+  primaryCta.href = '/podoguide/contact/';
+  primaryCta.textContent = 'Need help choosing?';
+  const secondaryCta = document.createElement('a');
+  secondaryCta.className = 'btn secondary';
+  secondaryCta.href = '/podoguide/treatments/';
+  secondaryCta.textContent = 'Explore treatments';
+  ctaWrap.appendChild(primaryCta);
+  ctaWrap.appendChild(secondaryCta);
+  hero.appendChild(ctaWrap);
+  return hero;
+}
+
+function buildOptions(options){
+  return options.map(option=>`<option value="${option.value}">${option.label}</option>`).join('');
+}
+
+function createFilterBar(initialCount, totalTracked){
+  const form = document.createElement('form');
+  form.id = 'city-filters';
+  form.className = 'card filter-bar';
+  form.setAttribute('aria-label','Filter podiatrists');
+  form.innerHTML = `
+    <label class="filter-field">
+      <span>Specialty</span>
+      <select id="filter-specialty" name="specialty">
+        ${buildOptions(specialtyFilters)}
+      </select>
+    </label>
+    <label class="filter-field">
+      <span>Insurance</span>
+      <select id="filter-insurance" name="insurance">
+        ${buildOptions(insuranceFilters)}
+      </select>
+    </label>
+    <label class="filter-field">
+      <span>Keyword</span>
+      <input type="search" id="filter-keyword" name="keyword" placeholder="Doctor, treatment, or condition" autocomplete="off"/>
+    </label>
+    <label class="filter-field">
+      <span>Sort by</span>
+      <select id="filter-sort" name="sort">
+        <option value="best">Best match</option>
+        <option value="rating">Highest rating</option>
+        <option value="experience">Years in practice</option>
+        <option value="name">Name (A–Z)</option>
+      </select>
+    </label>
+    <span class="results-pill" id="city-results-pill" aria-live="polite">Showing ${initialCount} of ${formatNumber(totalTracked)} podiatrists</span>
+  `;
+  form.addEventListener('submit', evt=>evt.preventDefault());
+  return form;
+}
+
+function createAccordionBlock(sections, cityName){
+  const wrapper = document.createElement('section');
+  wrapper.className = 'card accordion-block';
+  const heading = document.createElement('h2');
+  heading.textContent = `About podiatry in ${cityName}`;
+  wrapper.appendChild(heading);
+  const accordion = document.createElement('div');
+  accordion.className = 'accordion';
+  sections.forEach((section, index)=>{
+    if(!section) return;
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'accordion-trigger';
+    const triggerId = `accordion-trigger-${index}`;
+    const panelId = `accordion-panel-${index}`;
+    trigger.id = triggerId;
+    trigger.setAttribute('aria-controls', panelId);
+    trigger.setAttribute('aria-expanded', index===0 ? 'true' : 'false');
+    trigger.textContent = section.title || `Panel ${index+1}`;
+    const panel = document.createElement('div');
+    panel.className = 'accordion-panel';
+    panel.id = panelId;
+    panel.setAttribute('role','region');
+    panel.setAttribute('aria-labelledby', triggerId);
+    if(index!==0) panel.hidden = true;
+    panel.appendChild(section.content);
+    accordion.appendChild(trigger);
+    accordion.appendChild(panel);
+  });
+  wrapper.appendChild(accordion);
+  return wrapper;
+}
+
+function initAccordion(root){
+  if(!root) return;
+  const triggers = root.querySelectorAll('.accordion-trigger');
+  triggers.forEach(trigger=>{
+    trigger.addEventListener('click', ()=>{
+      const willExpand = trigger.getAttribute('aria-expanded') !== 'true';
+      triggers.forEach(btn=>{
+        const isTarget = btn===trigger;
+        btn.setAttribute('aria-expanded', isTarget && willExpand ? 'true':'false');
+        const panelId = btn.getAttribute('aria-controls');
+        const panel = panelId ? document.getElementById(panelId) : null;
+        if(panel){
+          panel.hidden = !(isTarget && willExpand);
+        }
+      });
+    });
+  });
+}
+
+function createInsightsWidget(){
+  const card = document.createElement('section');
+  card.className = 'rail-widget insights-widget';
+  const heading = document.createElement('div');
+  heading.className = 'rail-heading';
+  heading.innerHTML = '<p class="eyebrow">Latest insights</p><h3>Stay ahead of foot & ankle care</h3>';
+  const list = document.createElement('ol');
+  list.className = 'insights-list';
+  list.id = 'city-insights-list';
+  const loading = document.createElement('li');
+  loading.className = 'meta';
+  loading.textContent = 'Loading insights…';
+  list.appendChild(loading);
+  card.appendChild(heading);
+  card.appendChild(list);
+  return card;
+}
+
+async function hydrateInsightsList(cityName){
+  const list = document.getElementById('city-insights-list');
+  if(!list) return;
+  try{
+    const resp = await fetch(insightsEndpoint, {cache:'no-cache'});
+    if(!resp.ok) throw new Error('Unable to load insights');
+    const articles = await resp.json();
+    const subset = Array.isArray(articles) ? articles.slice(0,3) : [];
+    if(!subset.length){
+      list.innerHTML = '<li class="meta">Insights will appear here soon.</li>';
+      return;
+    }
+    list.innerHTML = '';
+    subset.forEach(article=>{
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = `/podoguide/insights/${article.id}/`;
+      link.textContent = article.title;
+      const dateObj = new Date(article.date);
+      const dateLabel = !isNaN(dateObj.getTime())
+        ? dateObj.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})
+        : article.date;
+      const meta = document.createElement('p');
+      meta.className = 'meta';
+      meta.textContent = `${dateLabel} • ${article.readTime || 3} min read`;
+      item.appendChild(link);
+      item.appendChild(meta);
+      list.appendChild(item);
+    });
+  }catch(err){
+    list.innerHTML = '<li class="meta">We couldn’t load the insights feed.</li>';
+  }
+}
+
+function createTreatmentsWidget(cityName){
+  const card = document.createElement('section');
+  card.className = 'rail-widget treatments-widget';
+  const heading = document.createElement('h3');
+  heading.textContent = `Top treatments in ${cityName}`;
+  card.appendChild(heading);
+  const list = document.createElement('ol');
+  list.className = 'rail-list';
+  treatmentLinks.forEach(link=>{
+    const item = document.createElement('li');
+    const anchor = document.createElement('a');
+    anchor.href = `/podoguide/treatments/${link.slug}/`;
+    anchor.textContent = link.label;
+    item.appendChild(anchor);
+    list.appendChild(item);
+  });
+  card.appendChild(list);
+  return card;
+}
+
+function createCtaWidget(cityName){
+  const card = document.createElement('section');
+  card.className = 'rail-widget rail-cta';
+  const heading = document.createElement('h3');
+  heading.textContent = 'Need help choosing?';
+  const copy = document.createElement('p');
+  copy.textContent = `Tell us about your ${cityName} goals and we’ll match you with a podiatrist.`;
+  const btn = document.createElement('a');
+  btn.className = 'btn primary';
+  btn.href = '/podoguide/contact/';
+  btn.textContent = 'Talk with a guide';
+  card.appendChild(heading);
+  card.appendChild(copy);
+  card.appendChild(btn);
+  return card;
+}
+
+function initCityFilters(grid, totalTracked){
+  if(!grid) return;
+  const search = document.getElementById('filter-keyword');
+  const specialty = document.getElementById('filter-specialty');
+  const insurance = document.getElementById('filter-insurance');
+  const sort = document.getElementById('filter-sort');
+  const pill = document.getElementById('city-results-pill');
+  const cards = Array.from(grid.querySelectorAll('.doctor-card'));
+  const comparators = {
+    rating:(a,b)=>parseFloat(b.dataset.rating||'0')-parseFloat(a.dataset.rating||'0'),
+    experience:(a,b)=>parseInt(b.dataset.years||'0',10)-parseInt(a.dataset.years||'0',10),
+    name:(a,b)=>(a.dataset.displayName||'').localeCompare(b.dataset.displayName||''),
+    best:(a,b)=>{
+      const ratingDiff = comparators.rating(a,b);
+      if(ratingDiff!==0) return ratingDiff;
+      const expDiff = comparators.experience(a,b);
+      if(expDiff!==0) return expDiff;
+      return parseInt(a.dataset.order||'0',10)-parseInt(b.dataset.order||'0',10);
+    }
+  };
+  const apply = ()=>{
+    const keyword = normalize(search && search.value);
+    const specialtyValue = normalize(specialty && specialty.value);
+    const insuranceValue = normalize(insurance && insurance.value);
+    const sortValue = (sort && sort.value) || 'best';
+    let visibleCount = 0;
+    cards.forEach(card=>{
+      const keywords = card.dataset.keywords || '';
+      const specialties = (card.dataset.specialties || '').split('|').filter(Boolean);
+      const insurances = (card.dataset.insurance || '').split('|').filter(Boolean);
+      const matchesKeyword = !keyword || keywords.indexOf(keyword)>-1;
+      const matchesSpecialty = !specialtyValue || specialties.indexOf(specialtyValue)>-1;
+      const matchesInsurance = !insuranceValue || insurances.indexOf(insuranceValue)>-1;
+      const visible = matchesKeyword && matchesSpecialty && matchesInsurance;
+      card.style.display = visible ? '' : 'none';
+      if(visible) visibleCount++;
+    });
+    const visibleCards = cards.filter(card=>card.style.display!=='none');
+    const comparator = comparators[sortValue] || comparators.best;
+    visibleCards.sort(comparator);
+    visibleCards.forEach(card=>grid.appendChild(card));
+    if(pill){
+      pill.textContent = `Showing ${visibleCount} of ${formatNumber(totalTracked)} podiatrists`;
+      pill.setAttribute('aria-label', `${visibleCount} of ${totalTracked} podiatrists visible`);
+    }
+  };
+  applyCityFilters = apply;
+  if(search) search.addEventListener('input', apply);
+  if(specialty) specialty.addEventListener('change', apply);
+  if(insurance) insurance.addEventListener('change', apply);
+  if(sort) sort.addEventListener('change', apply);
+  apply();
+}
+
+function initCityDirectoryPage(){
+  if(!hasDocument) return;
+  const container = document.querySelector('main .container');
+  if(!container) return;
+  const providerNodes = Array.from(container.querySelectorAll('[data-provider]'));
+  if(!providerNodes.length) return;
+  const headingEl = container.querySelector('h1');
+  const headingText = headingEl ? headingEl.textContent.trim() : '';
+  const cityName = getCityName(headingText);
+  const cityCountEl = container.querySelector('.city-count');
+  const stats = parseCityStats(cityCountEl ? cityCountEl.textContent : '');
+  const updatedCopy = getUpdatedCopy();
+  const stickySearch = container.querySelector('.sticky-search');
+  if(stickySearch) stickySearch.remove();
+  if(headingEl) headingEl.remove();
+  if(cityCountEl) cityCountEl.remove();
+  const aboutSection = extractSection(container, /About podiatry/i);
+  const conditionsSection = extractSection(container, /Common conditions/i);
+  const treatmentsSection = extractSection(container, /Common treatments/i);
+  const directoryHeading = extractHeading(container, /podiatrist directory/i) || `${cityName} podiatrist directory`;
+  const pagination = container.querySelector('.pagination');
+  if(pagination) pagination.remove();
+  const adSlot = container.querySelector('.ad');
+  if(adSlot) adSlot.remove();
+  const doctorCards = providerNodes.map((node,index)=>{
+    const card = createDoctorCard(node, cityName, index);
+    node.remove();
+    return card;
+  });
+  container.innerHTML = '';
+  const layout = document.createElement('div');
+  layout.className = 'city-layout';
+  const mainCol = document.createElement('div');
+  mainCol.className = 'city-layout-main';
+  const rail = document.createElement('aside');
+  rail.className = 'city-layout-rail';
+  layout.appendChild(mainCol);
+  layout.appendChild(rail);
+  container.appendChild(layout);
+  const totalTracked = stats.total || doctorCards.length;
+  mainCol.appendChild(createHeroCard(headingText || `Podiatrists in ${cityName}, FL`, totalTracked, stats.pageCopy, updatedCopy));
+  mainCol.appendChild(createFilterBar(doctorCards.length, totalTracked));
+  const listHeading = document.createElement('h2');
+  listHeading.textContent = directoryHeading;
+  mainCol.appendChild(listHeading);
+  const doctorGrid = document.createElement('div');
+  doctorGrid.className = 'doctor-grid';
+  doctorGrid.id = 'doctor-grid';
+  doctorCards.forEach(card=>doctorGrid.appendChild(card));
+  mainCol.appendChild(doctorGrid);
+  if(pagination) mainCol.appendChild(pagination);
+  const accordionSections = [aboutSection, conditionsSection, treatmentsSection].filter(Boolean);
+  if(accordionSections.length){
+    const accordionBlock = createAccordionBlock(accordionSections, cityName);
+    mainCol.appendChild(accordionBlock);
+    initAccordion(accordionBlock);
+  }
+  const insightsWidget = createInsightsWidget();
+  rail.appendChild(insightsWidget);
+  rail.appendChild(createTreatmentsWidget(cityName));
+  rail.appendChild(createCtaWidget(cityName));
+  if(adSlot) rail.appendChild(adSlot);
+  initCityFilters(doctorGrid, totalTracked);
+  hydrateInsightsList(cityName);
+}
+
 const isTestEnv = typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test';
 
 if(hasDocument && !isTestEnv){
@@ -362,6 +964,7 @@ if(hasDocument && !isTestEnv){
     initNavToggle();
     initLeafletMap();
     loadGoogleReviews();
+    initCityDirectoryPage();
   });
 }
 
