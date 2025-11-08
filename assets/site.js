@@ -16,6 +16,37 @@ const hasWindow = typeof window !== 'undefined';
 const hasDocument = typeof document !== 'undefined';
 const hasLocalStorage = typeof localStorage !== 'undefined';
 
+const assetRoot = (() => {
+  if(hasDocument){
+    const scripts = [];
+    if(document.currentScript) scripts.push(document.currentScript);
+    scripts.push(...document.querySelectorAll('script[src]'));
+    const match = scripts.find(s=>s && s.src && s.src.includes('assets/site.js'));
+    if(match){
+      const parsed = new URL(match.src, hasWindow && window.location ? window.location.href : undefined);
+      parsed.pathname = parsed.pathname.replace(/[^/]+$/, '');
+      return parsed.href;
+    }
+  }
+  if(hasWindow && window.location && window.location.href){
+    return new URL('assets/', window.location.href).href;
+  }
+  return 'assets/';
+})();
+
+function getAssetUrl(file){
+  try{
+    return new URL(file, assetRoot).href;
+  }catch(e){
+    if(hasWindow && window.location){
+      try{
+        return new URL(file, window.location.href).href;
+      }catch(err){}
+    }
+    return `${assetRoot}${file}`;
+  }
+}
+
 const topFloridaCities = [
   {name:'Miami', coords:[25.7617,-80.1918], count:5022, url:'/podoguide/podiatrists/fl/miami/'},
   {name:'Orlando', coords:[28.5383,-81.3792], count:4216, url:'/podoguide/podiatrists/fl/orlando/'},
@@ -124,7 +155,7 @@ async function loadGoogleReviews(){
   }
   const statusEl = reviewsBlock.querySelector('.meta');
   try{
-    const resp = await fetch('/podoguide/assets/reviews.json',{cache:'no-store'});
+    const resp = await fetch(getAssetUrl('reviews.json'),{cache:'no-store'});
     if(!resp.ok) throw new Error('Missing reviews');
     const data = await resp.json();
     const match = Array.isArray(data) ? data.find(item=>String(item.npi)===String(npi)) : null;
@@ -247,7 +278,7 @@ function initLeafletMap(){
     }
   }
 
-  fetch('/podoguide/assets/florida-boundary.geojson')
+  fetch(getAssetUrl('florida-boundary.geojson'))
     .then(resp=>resp.ok ? resp.json() : null)
     .then(data=>{
       if(!data) return;

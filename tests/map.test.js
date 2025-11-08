@@ -42,10 +42,6 @@ beforeEach(() => {
     value: dom.window.navigator,
     configurable: true
   });
-  Object.defineProperty(global, 'location', {
-    value: { assign: vi.fn() },
-    configurable: true
-  });
   global.localStorage = {
     length: 0,
     key: vi.fn(),
@@ -135,7 +131,7 @@ it('fetches the Florida boundary GeoJSON and fits bounds', async () => {
   initLeafletMap();
   await flushPromises();
   await flushPromises();
-  expect(global.fetch).toHaveBeenCalledWith('/podoguide/assets/florida-boundary.geojson');
+  expect(global.fetch).toHaveBeenCalledWith('https://example.com/podoguide/assets/florida-boundary.geojson');
   expect(global.L.geoJSON).toHaveBeenCalled();
   expect(mapInstance.fitBounds).toHaveBeenCalled();
   expect(geoJsonOptions && geoJsonOptions.interactive).toBe(false);
