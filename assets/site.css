@@ -29,6 +29,9 @@
   aspect-ratio:728/200;
   min-height:200px;
   max-height:240px;
+  --city-pos-x:50%;
+  --city-pos-y:50%;
+  --city-hue:0deg;
 }
 .city-hero-media img{
   position:absolute;
@@ -36,7 +39,8 @@
   width:100%;
   height:100%;
   object-fit:cover;
-  filter:saturate(.85);
+  object-position:var(--city-pos-x,50%) var(--city-pos-y,50%);
+  filter:saturate(.85) hue-rotate(var(--city-hue,0deg));
 }
 .city-hero-media::after{
   content:'';
@@ -60,6 +64,12 @@
   font-size:clamp(1.2rem,4vw,2rem);
   text-transform:none;
   letter-spacing:.02em;
+}
+.hero-count{
+  margin:var(--space-2) 0 0;
+  font-size:1rem;
+  font-weight:600;
+  color:#fff;
 }
 .city-hero-media figcaption{
   position:absolute;

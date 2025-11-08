@@ -681,7 +681,12 @@ function createHeroCard(headingText, totalTracked, pageCopy, updatedCopy, cityNa
   const title = document.createElement('h1');
   const locationLabel = headingText || `Podiatrists in ${cityName}, FL`;
   title.textContent = locationLabel;
+  const count = document.createElement('p');
+  count.className = 'hero-count';
+  const totalLabel = totalTracked ? `${formatNumber(totalTracked)} podiatrists tracked` : 'PodoGuide coverage';
+  count.textContent = totalLabel;
   overlay.appendChild(title);
+  overlay.appendChild(count);
   hero.appendChild(media);
   return hero;
 }
@@ -703,6 +708,13 @@ function createCityHeroMedia(photoMeta, cityName){
   const overlay = document.createElement('div');
   overlay.className = 'city-hero-overlay';
   media.appendChild(overlay);
+  const visualHash = hashString(`${cityName}-${photoMeta && photoMeta.file || ''}`);
+  const posX = 30 + (visualHash % 40);
+  const posY = 30 + ((visualHash >> 3) % 40);
+  const hue = visualHash % 360;
+  media.style.setProperty('--city-pos-x', `${posX}%`);
+  media.style.setProperty('--city-pos-y', `${posY}%`);
+  media.style.setProperty('--city-hue', `${hue}deg`);
   if(photoMeta && photoMeta.credit && photoMeta.credit.photographer){
     const credit = document.createElement('figcaption');
     credit.className = 'meta';
