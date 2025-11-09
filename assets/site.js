@@ -873,19 +873,6 @@ function createStayAheadCard(){
   return card;
 }
 
-function transformAdSlot(adSlot){
-  if(!adSlot) return null;
-  adSlot.classList.remove('ad');
-  adSlot.classList.add('rail-widget','stay-ahead-card');
-  adSlot.innerHTML = `
-    <p class="eyebrow">Insights</p>
-    <strong>Stay ahead of foot &amp; ankle care</strong>
-    <p class="meta">Mary Voight, DPM shares recovery tips, footwear audits, and prevention checklists every week.</p>
-    <a class="btn secondary" href="/podoguide/insights/">Browse insights</a>
-  `;
-  return adSlot;
-}
-
 function initCityFilters(grid, totalTracked){
   if(!grid) return;
   const search = document.getElementById('filter-keyword');
@@ -957,19 +944,14 @@ async function initCityDirectoryPage(){
   if(stickySearch) stickySearch.remove();
   if(headingEl) headingEl.remove();
   if(cityCountEl) cityCountEl.remove();
-  const aboutSection = extractSection(container, /About podiatry/i);
-  const conditionsSection = extractSection(container, /Common conditions/i);
-  const treatmentsSection = extractSection(container, /Common treatments/i);
+  extractSection(container, /About podiatry/i);
+  extractSection(container, /Common conditions/i);
+  extractSection(container, /Common treatments/i);
   const directoryHeading = extractHeading(container, /podiatrist directory/i) || `${cityName} podiatrist directory`;
   const pagination = container.querySelector('.pagination');
   if(pagination) pagination.remove();
   const adSlot = container.querySelector('.ad');
   if(adSlot) adSlot.remove();
-  container.querySelectorAll('h2').forEach(heading=>{
-    if(/About podiatry/i.test(heading.textContent||'')){
-      heading.remove();
-    }
-  });
   const doctorCards = providerNodes.map((node,index)=>{
     const card = createDoctorCard(node, cityName, index);
     node.remove();
@@ -986,7 +968,6 @@ async function initCityDirectoryPage(){
   layout.appendChild(rail);
   container.appendChild(layout);
   const totalTracked = stats.total || doctorCards.length;
-  const aboutSections = [aboutSection, conditionsSection, treatmentsSection].filter(Boolean);
   let cityPhoto = null;
   try{
     const manifest = await loadCityPhotoManifest();
@@ -995,11 +976,6 @@ async function initCityDirectoryPage(){
     cityPhoto = null;
   }
   mainCol.appendChild(createHeroCard(headingText || `Podiatrists in ${cityName}, FL`, totalTracked, stats.pageCopy, updatedCopy, cityName, cityPhoto));
-  if(aboutSections.length){
-    const accordionBlock = createAccordionBlock(aboutSections);
-    mainCol.appendChild(accordionBlock);
-    initAccordion(accordionBlock);
-  }
   mainCol.appendChild(createFilterBar(doctorCards.length, totalTracked));
   const listHeading = document.createElement('h2');
   listHeading.textContent = directoryHeading;
@@ -1010,14 +986,7 @@ async function initCityDirectoryPage(){
   doctorCards.forEach(card=>doctorGrid.appendChild(card));
   mainCol.appendChild(doctorGrid);
   if(pagination) mainCol.appendChild(pagination);
-  let stayAheadCard = null;
-  if(adSlot){
-    stayAheadCard = transformAdSlot(adSlot);
-  }
-  if(!stayAheadCard){
-    stayAheadCard = createStayAheadCard();
-  }
-  if(stayAheadCard) rail.appendChild(stayAheadCard);
+  rail.appendChild(createStayAheadCard());
   rail.appendChild(createTreatmentsWidget(cityName));
   rail.appendChild(createCtaWidget(cityName));
   initCityFilters(doctorGrid, totalTracked);
