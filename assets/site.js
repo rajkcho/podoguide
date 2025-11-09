@@ -174,6 +174,7 @@ function removeNanTokens(value){
 function cleanInlineText(value){
   if(!value) return '';
   return removeNanTokens(value)
+    .replace(/\b(\d{5})\d{4}\b/g,'$1')
     .replace(/\s{2,}/g,' ')
     .replace(/\s+,/g,', ')
     .replace(/,\s*,/g,', ')
@@ -210,7 +211,7 @@ function parseAddressComponents(line){
     result.city = parts.slice(0, parts.length-1).join(', ');
     const stateZip = parts[parts.length-1].split(/\s+/).filter(Boolean);
     result.state = (stateZip.shift() || '').toUpperCase();
-    result.postalCode = stateZip.join(' ');
+    result.postalCode = stateZip.join(' '); 
   }else if(parts.length === 1){
     const fragment = parts[0];
     const stateZip = fragment.split(/\s+/).filter(Boolean);
