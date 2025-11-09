@@ -4,6 +4,7 @@ set -euo pipefail
 BUILD_DIR=${1:-"."}
 BRANCH=${2:-"gh-pages"}
 projectRoot=$(git rev-parse --show-toplevel)
+remoteUrl=$(git config --get remote.origin.url)
 
 ABS_BUILD_DIR=$(cd "$BUILD_DIR" && pwd)
 ASSETS_DIR="$ABS_BUILD_DIR/assets"
@@ -21,7 +22,7 @@ cleanup(){
 }
 trap cleanup EXIT
 
-git clone --branch "$BRANCH" "$projectRoot" "$TEMP_DIR" >/dev/null 2>&1
+git clone --branch "$BRANCH" "$remoteUrl" "$TEMP_DIR" >/dev/null 2>&1
 rsync -a --delete --exclude '.git' "$ABS_BUILD_DIR"/ "$TEMP_DIR"/
 
 pushd "$TEMP_DIR" >/dev/null
