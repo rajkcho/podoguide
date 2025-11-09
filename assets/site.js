@@ -937,7 +937,7 @@ function createInsightsWidget(articles){
   return card;
 }
 
-function initCityFilters(grid, totalTracked){
+function initCityFilters(grid, totalTracked, pagination){
   if(!grid) return;
   const search = document.getElementById('filter-keyword');
   const specialty = document.getElementById('filter-specialty');
@@ -945,6 +945,7 @@ function initCityFilters(grid, totalTracked){
   const sort = document.getElementById('filter-sort');
   const pill = document.getElementById('city-results-pill');
   const cards = Array.from(grid.querySelectorAll('.doctor-card'));
+  const allCardsCount = cards.length;
   const comparators = {
     rating:(a,b)=>parseFloat(b.dataset.rating||'0')-parseFloat(a.dataset.rating||'0'),
     experience:(a,b)=>parseInt(b.dataset.years||'0',10)-parseInt(a.dataset.years||'0',10),
@@ -957,7 +958,7 @@ function initCityFilters(grid, totalTracked){
       return parseInt(a.dataset.order||'0',10)-parseInt(b.dataset.order||'0',10);
     }
   };
-  const apply = ()=>{
+    const apply = ()=>{
     const keyword = normalize(search && search.value);
     const specialtyValue = normalize(specialty && specialty.value);
     const insuranceValue = normalize(insurance && insurance.value);
@@ -982,13 +983,16 @@ function initCityFilters(grid, totalTracked){
       pill.textContent = `Showing ${visibleCount} of ${formatNumber(totalTracked)} podiatrists`;
       pill.setAttribute('aria-label', `${visibleCount} of ${totalTracked} podiatrists visible`);
     }
-  };
-  applyCityFilters = apply;
+    if(pagination){
+      pagination.hidden = visibleCount < allCardsCount;
+    }
+    };
+    applyCityFilters = apply;
   if(search) search.addEventListener('input', apply);
   if(specialty) specialty.addEventListener('change', apply);
   if(insurance) insurance.addEventListener('change', apply);
-  if(sort) sort.addEventListener('change', apply);
-  apply();
+    if(sort) sort.addEventListener('change', apply);
+    apply();
 }
 
 async function initCityDirectoryPage(){
@@ -1060,7 +1064,7 @@ async function initCityDirectoryPage(){
   if(pagination) mainCol.appendChild(pagination);
   const insightsWidget = createInsightsWidget(insightsArticles);
   rail.appendChild(insightsWidget);
-  initCityFilters(doctorGrid, totalTracked);
+  initCityFilters(doctorGrid, totalTracked, pagination);
 }
 
 const isTestEnv = typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test';
