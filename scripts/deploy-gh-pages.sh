@@ -16,20 +16,19 @@ npm run copy-config "$ASSETS_DIR"
 
 TEMP_DIR=$(mktemp -d)
 cleanup(){
-  git worktree remove --force "$TEMP_DIR" >/dev/null 2>&1 || true
+  rm -rf "$TEMP_DIR"
 }
 trap cleanup EXIT
 
-git worktree add "$TEMP_DIR" "$BRANCH"
-
+git clone --branch "$BRANCH" "$projectRoot" "$TEMP_DIR" >/dev/null 2>&1
 rsync -a --delete --exclude '.git' "$ABS_BUILD_DIR"/ "$TEMP_DIR"/
 
 pushd "$TEMP_DIR" >/dev/null
-if git diff --quiet --cached; then
-  echo "No changes to deploy."
-else
+if [ -n "$(git status --short)" ]; then
   git add -A
   git commit -m "Deploy site $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   git push origin "$BRANCH"
+else
+  echo "No changes to deploy."
 fi
 popd >/dev/null
