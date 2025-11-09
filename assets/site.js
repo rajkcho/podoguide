@@ -786,12 +786,18 @@ function createCitySummaryCard(cityName, sections, maxWords=150){
     const text = collectSectionCopy(section);
     if(!text) return;
     const limit = Math.max( Math.min(Math.floor(maxWords / totalSections), remaining), 1);
-    const { value, used } = takeWords(text, limit);
+    const { value, used } = takeWords(text, limit, false);
     if(!value) return;
     remaining -= used;
     const paragraph = document.createElement('p');
-    paragraph.textContent = value;
+    paragraph.textContent = value.replace(/[.?!…]*$/,'').trim() + '.';
     card.appendChild(paragraph);
+    if(index < sections.length - 1){
+      const breaker = document.createElement('br');
+      breaker.className = 'city-summary-break';
+      breaker.setAttribute('aria-hidden','true');
+      card.appendChild(breaker);
+    }
   });
   return card.childElementCount ? card : null;
 }
