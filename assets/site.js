@@ -55,6 +55,604 @@ function getAssetUrl(file){
   }
 }
 
+const DEFAULT_MAP_CENTER = { lat:27.6648, lng:-81.5158 };
+const NAN_PATTERN = /\bnan\b/gi;
+const REVIEW_STORAGE_KEY = 'pg:google-reviews-v1';
+const REVIEW_CACHE_TTL = 1000 * 60 * 60 * 24 * 5;
+
+let siteConfigPromise=null;
+let cachedConfig=null;
+let googleMapsPromise=null;
+let reviewCacheLoaded=false;
+let reviewCacheStore={};
+let reviewSaveTimer=null;
+let podiatristProfileCache=null;
+
+function loadSiteConfig(){
+  if(siteConfigPromise) return siteConfigPromise;
+  if(!hasDocument) return Promise.resolve({});
+  siteConfigPromise = fetch(getAssetUrl('config.json'), {cache:'no-store'})
+    .then(resp=>resp && resp.ok ? resp.json() : {})
+    .catch(()=>({}));
+  return siteConfigPromise;
+}
+
+async function getGoogleMapsApiKey(){
+  if(typeof globalThis !== 'undefined' && globalThis.__PODOGUIDE_MAPS_KEY__){
+    return globalThis.__PODOGUIDE_MAPS_KEY__;
+  }
+  if(hasDocument){
+    const meta = document.querySelector('meta[name="pg:maps-key"]');
+    if(meta && meta.content) return meta.content.trim();
+  }
+  if(cachedConfig && cachedConfig.googleMapsApiKey){
+    return cachedConfig.googleMapsApiKey;
+  }
+  cachedConfig = await loadSiteConfig();
+  return cachedConfig.googleMapsApiKey || '';
+}
+
+function loadGoogleMapsSdk(){
+  if(typeof google !== 'undefined' && google.maps) return Promise.resolve(google);
+  if(googleMapsPromise) return googleMapsPromise;
+  googleMapsPromise = (async()=>{
+    const apiKey = await getGoogleMapsApiKey();
+    if(!apiKey) throw new Error('Missing Google Maps API key');
+    if(!hasDocument) throw new Error('Document not available for Google Maps');
+    return new Promise((resolve,reject)=>{
+      const existing = document.querySelector('script[data-google-maps]');
+      if(existing){
+        existing.addEventListener('load', ()=>resolve(globalThis.google));
+        existing.addEventListener('error', reject);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      script.dataset.googleMaps = 'true';
+      script.onload = ()=>resolve(globalThis.google);
+      script.onerror = err=>reject(err || new Error('Google Maps failed to load'));
+      document.head.appendChild(script);
+    });
+  })();
+  return googleMapsPromise;
+}
+
+function getReviewCache(){
+  if(reviewCacheLoaded) return reviewCacheStore;
+  reviewCacheLoaded = true;
+  reviewCacheStore = {};
+  if(hasLocalStorage){
+    try{
+      const raw = localStorage.getItem(REVIEW_STORAGE_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        if(parsed && typeof parsed === 'object'){
+          reviewCacheStore = parsed;
+        }
+      }
+    }catch(err){
+      reviewCacheStore = {};
+    }
+  }
+  return reviewCacheStore;
+}
+
+function getCachedReview(npi){
+  if(!npi) return null;
+  const cache = getReviewCache();
+  const record = cache[npi];
+  if(record && record.fetchedAt && (Date.now() - record.fetchedAt) < REVIEW_CACHE_TTL){
+    return record;
+  }
+  return null;
+}
+
+function persistReviewCache(){
+  if(!hasLocalStorage || !reviewCacheLoaded) return;
+  if(reviewSaveTimer) clearTimeout(reviewSaveTimer);
+  reviewSaveTimer = setTimeout(()=>{
+    try{
+      localStorage.setItem(REVIEW_STORAGE_KEY, JSON.stringify(reviewCacheStore));
+    }catch(err){}
+  },250);
+}
+
+function storeCachedReview(npi, data){
+  if(!npi || !data) return;
+  const cache = getReviewCache();
+  cache[npi] = Object.assign({}, data, { fetchedAt: Date.now() });
+  persistReviewCache();
+}
+
+function removeNanTokens(value){
+  if(!value) return '';
+  return value.replace(NAN_PATTERN,' ');
+}
+
+function cleanInlineText(value){
+  if(!value) return '';
+  return removeNanTokens(value)
+    .replace(/\s{2,}/g,' ')
+    .replace(/\s+,/g,', ')
+    .replace(/,\s*,/g,', ')
+    .replace(/,\s*$/,'')
+    .trim();
+}
+
+function sanitizeAddressHtml(html){
+  if(!html) return [];
+  return html
+    .split(/<br\s*\/?>/i)
+    .map(part=>cleanInlineText(part))
+    .filter(Boolean);
+}
+
+function parseJsonLd(){
+  if(!hasDocument) return { node:null, data:null };
+  const script = document.querySelector('script[type="application/ld+json"]');
+  if(!script) return { node:null, data:null };
+  try{
+    return { node:script, data:JSON.parse(script.textContent) };
+  }catch(err){
+    return { node:script, data:null };
+  }
+}
+
+function parseAddressComponents(line){
+  const result = { street:'', city:'', state:'', postalCode:'' };
+  if(!line) return result;
+  const parts = line.split(',').map(part=>part.trim()).filter(Boolean);
+  if(!parts.length) return result;
+  result.street = parts.shift() || '';
+  if(parts.length >= 2){
+    result.city = parts.slice(0, parts.length-1).join(', ');
+    const stateZip = parts[parts.length-1].split(/\s+/).filter(Boolean);
+    result.state = (stateZip.shift() || '').toUpperCase();
+    result.postalCode = stateZip.join(' ');
+  }else if(parts.length === 1){
+    const fragment = parts[0];
+    const stateZip = fragment.split(/\s+/).filter(Boolean);
+    if(stateZip.length>=2){
+      result.city = stateZip.slice(0, stateZip.length-2).join(' ');
+      result.state = (stateZip[stateZip.length-2] || '').toUpperCase();
+      result.postalCode = stateZip[stateZip.length-1] || '';
+    }else{
+      result.city = fragment;
+    }
+  }
+  return result;
+}
+
+function extractNpiFromUrl(url){
+  if(!url) return '';
+  const match = url.match(/podiatrist\/(\d{10})/i);
+  return match ? match[1] : '';
+}
+
+function buildSearchQueryFromContext(context){
+  if(!context) return '';
+  if(context.searchQuery) return context.searchQuery;
+  const parts = [];
+  if(context.name) parts.push(context.name);
+  if(context.street) parts.push(context.street);
+  if(context.city) parts.push(context.city);
+  if(context.state) parts.push(context.state);
+  if(!parts.length && context.fullAddress) parts.push(context.fullAddress);
+  parts.push('podiatrist');
+  return parts.filter(Boolean).join(' ');
+}
+
+function sanitizePodiatristProfile(){
+  if(podiatristProfileCache) return podiatristProfileCache;
+  if(!hasDocument || !document.body.classList.contains('podiatrist-page')) return null;
+  const npi = document.body.getAttribute('data-npi') || '';
+  const heading = document.querySelector('h1');
+  const rawName = heading ? heading.textContent : '';
+  const cleanName = cleanInlineText(rawName) || 'Local podiatrist';
+  if(heading) heading.textContent = cleanName;
+  const title = document.querySelector('title');
+  if(title) title.textContent = `${cleanName} • PodoGuide`;
+  const mapLink = document.querySelector('.map-link');
+  let addressLines = [];
+  let sanitizedMapHref = '';
+  if(mapLink){
+    addressLines = sanitizeAddressHtml(mapLink.innerHTML);
+    mapLink.innerHTML = addressLines.join('<br/>');
+    if(mapLink.href){
+      try{
+        const parsed = new URL(mapLink.href);
+        const query = parsed.searchParams.get('query');
+        if(query){
+          parsed.searchParams.set('query', cleanInlineText(query));
+          mapLink.href = parsed.toString();
+          sanitizedMapHref = mapLink.href;
+        }
+      }catch(err){}
+    }
+  }
+  if(sanitizedMapHref){
+    document.querySelectorAll('a[href*="google.com/maps/search"]').forEach(anchor=>{
+      anchor.href = sanitizedMapHref;
+    });
+  }
+  const { node:ldNode, data:ldData } = parseJsonLd();
+  if(ldData){
+    if(cleanName) ldData.name = cleanName;
+    if(ldData.address){
+      if(ldData.address.streetAddress) ldData.address.streetAddress = cleanInlineText(ldData.address.streetAddress);
+      if(ldData.address.addressLocality) ldData.address.addressLocality = cleanInlineText(ldData.address.addressLocality);
+      if(ldData.address.addressRegion) ldData.address.addressRegion = cleanInlineText(ldData.address.addressRegion);
+      if(ldData.address.postalCode) ldData.address.postalCode = cleanInlineText(ldData.address.postalCode);
+    }
+    if(ldNode) ldNode.textContent = JSON.stringify(ldData);
+  }
+  const rawStreetChunks = addressLines.slice(0, Math.max(1, addressLines.length-1));
+  const rawStreetLine = rawStreetChunks.join(' ').trim();
+  const cityLine = addressLines.length>1 ? addressLines[addressLines.length-1] : '';
+  const parsedFallback = parseAddressComponents(cityLine ? `${rawStreetLine}, ${cityLine}` : rawStreetLine);
+  const structuredAddress = ldData && ldData.address ? ldData.address : {};
+  const address = {
+    street: structuredAddress.streetAddress || cleanInlineText(rawStreetLine) || parsedFallback.street || '',
+    city: structuredAddress.addressLocality || parsedFallback.city || '',
+    state: structuredAddress.addressRegion || parsedFallback.state || 'FL',
+    postalCode: structuredAddress.postalCode || parsedFallback.postalCode || ''
+  };
+  const phoneAnchor = document.querySelector('[href^="tel:"]');
+  const phone = phoneAnchor ? phoneAnchor.textContent.replace(/\s+/g,' ').trim() : '';
+  const fullAddress = cleanInlineText([
+    address.street,
+    address.city && address.state ? `${address.city}, ${address.state}` : address.city || address.state,
+    address.postalCode
+  ].filter(Boolean).join(' '));
+  const profile = {
+    npi,
+    name: cleanName,
+    address,
+    phone,
+    street: address.street,
+    city: address.city,
+    state: address.state,
+    postalCode: address.postalCode,
+    fullAddress,
+    searchQuery: buildSearchQueryFromContext({ name: cleanName, street: address.street, city: address.city, state: address.state })
+  };
+  podiatristProfileCache = profile;
+  return profile;
+}
+
+function ensureContactCardLayout(){
+  const contactCard = document.querySelector('h2 + .card');
+  if(!contactCard) return null;
+  let details = contactCard.querySelector('.contact-details');
+  if(!details){
+    details = document.createElement('div');
+    details.className = 'contact-details';
+    while(contactCard.firstChild){
+      details.appendChild(contactCard.firstChild);
+    }
+    contactCard.appendChild(details);
+  }
+  contactCard.classList.add('contact-card');
+  let mapPanel = contactCard.querySelector('.clinic-map');
+  if(!mapPanel){
+    mapPanel = document.createElement('div');
+    mapPanel.className = 'clinic-map';
+    const status = document.createElement('p');
+    status.className = 'map-status';
+    status.textContent = 'Loading map…';
+    mapPanel.appendChild(status);
+    contactCard.appendChild(mapPanel);
+  }
+  return { contactCard, details, mapPanel };
+}
+
+function showMapStatus(container, message){
+  if(!container) return;
+  let status = container.querySelector('.map-status');
+  if(!status){
+    status = document.createElement('p');
+    status.className = 'map-status';
+    container.appendChild(status);
+  }
+  status.textContent = message;
+}
+
+function clearMapStatus(container){
+  if(!container) return;
+  const status = container.querySelector('.map-status');
+  if(status) status.remove();
+}
+
+function renderClinicMapForProfile(googleLib, container, profile){
+  if(!container){
+    return null;
+  }
+  container.innerHTML = '';
+  const canvas = document.createElement('div');
+  canvas.className = 'clinic-map-canvas';
+  container.appendChild(canvas);
+  showMapStatus(container, 'Loading map…');
+  if(!googleLib){
+    showMapStatus(container, 'Google Maps unavailable right now.');
+    return null;
+  }
+  const map = new googleLib.maps.Map(canvas, {
+    center: DEFAULT_MAP_CENTER,
+    zoom: 13,
+    mapTypeControl:false,
+    streetViewControl:false,
+    fullscreenControl:false
+  });
+  if(!profile || !profile.fullAddress){
+    showMapStatus(container, 'Clinic address unavailable.');
+    return map;
+  }
+  const geocoder = new googleLib.maps.Geocoder();
+  geocoder.geocode({ address: profile.fullAddress }, (results,status)=>{
+    if(status === 'OK' && results && results[0]){
+      clearMapStatus(container);
+      updateMapMarker(map, googleLib, results[0].geometry && results[0].geometry.location, profile.name);
+    }else{
+      showMapStatus(container, 'Google Maps could not locate this clinic yet.');
+    }
+  });
+  return map;
+}
+
+function normalizeLatLng(value){
+  if(!value) return null;
+  if(typeof value.lat === 'function'){
+    return { lat:value.lat(), lng:value.lng() };
+  }
+  if(typeof value.lat === 'number' && typeof value.lng === 'number'){
+    return value;
+  }
+  if(value.lat && value.lng){
+    return { lat:Number(value.lat), lng:Number(value.lng) };
+  }
+  return null;
+}
+
+function updateMapMarker(map, googleLib, location, title){
+  if(!map || !googleLib) return;
+  const normalized = normalizeLatLng(location);
+  if(!normalized) return;
+  if(map.__clinicMarker){
+    map.__clinicMarker.setMap(null);
+  }
+  map.__clinicMarker = new googleLib.maps.Marker({
+    map,
+    position: normalized,
+    title: title || 'Clinic location'
+  });
+  if(map.setCenter) map.setCenter(normalized);
+}
+
+function ensureReviewBlock(details){
+  if(!details) return null;
+  let block = details.querySelector('.google-reviews');
+  if(!block){
+    block = document.createElement('div');
+    block.className = 'google-reviews';
+    const heading = document.createElement('strong');
+    heading.textContent = 'Google reviews';
+    const meta = document.createElement('p');
+    meta.className = 'meta';
+    meta.textContent = 'Checking Google reviews…';
+    block.appendChild(heading);
+    block.appendChild(meta);
+    details.appendChild(block);
+  }
+  return block;
+}
+
+function renderReviewSummary(block, data){
+  if(!block) return;
+  const statusEl = block.querySelector('.meta') || (()=>{
+    const meta = document.createElement('p');
+    meta.className = 'meta';
+    block.appendChild(meta);
+    return meta;
+  })();
+  if(data && typeof data.rating==='number' && typeof data.count==='number'){
+    statusEl.innerHTML = `<span class="rating-pill">${data.rating.toFixed(1)} ★</span> ${data.count.toLocaleString()} Google reviews`;
+  }else{
+    statusEl.textContent = 'Google reviews not yet available for this clinician.';
+  }
+  let summaryEl = block.querySelector('.review-summary');
+  if(!summaryEl){
+    summaryEl = document.createElement('p');
+    summaryEl.className = 'review-summary';
+    block.appendChild(summaryEl);
+  }
+  summaryEl.textContent = data && data.summary ? data.summary : 'Patients have not published a public summary yet.';
+  if(data && data.url){
+    let link = block.querySelector('.review-link');
+    if(!link){
+      link = document.createElement('a');
+      link.className = 'review-link';
+      block.appendChild(link);
+    }
+    link.href = data.url;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.textContent = 'Read on Google';
+  }
+}
+
+function extractPlaceSummary(place){
+  if(place && place.editorial_summary && place.editorial_summary.overview){
+    return place.editorial_summary.overview;
+  }
+  if(place && Array.isArray(place.reviews) && place.reviews.length){
+    const snippet = takeWords(place.reviews[0].text || place.reviews[0].body || '', 40);
+    return snippet.value || '';
+  }
+  return '';
+}
+
+function pickBestPlaceMatch(results, context){
+  if(!Array.isArray(results) || !results.length) return null;
+  if(results.length===1) return results[0];
+  const targetCity = (context && (context.city || '')).toLowerCase();
+  const targetStreet = (context && (context.street || '')).toLowerCase();
+  const targetName = (context && (context.name || '')).toLowerCase();
+  let best = results[0];
+  let bestScore = -Infinity;
+  results.forEach(place=>{
+    let score = 0;
+    const addr = (place.formatted_address || '').toLowerCase();
+    if(targetCity && addr.includes(targetCity)) score += 4;
+    if(targetStreet){
+      const firstWord = targetStreet.split(' ')[0];
+      if(firstWord && addr.includes(firstWord)) score += 2;
+    }
+    if(targetName && place.name && place.name.toLowerCase().includes(targetName.split(' ')[0])) score += 2;
+    if(place.business_status === 'OPERATIONAL') score += 1;
+    if(score > bestScore){
+      bestScore = score;
+      best = place;
+    }
+  });
+  return best;
+}
+
+function fetchGooglePlaceDetails(googleLib, context, map){
+  if(!googleLib || !context) return Promise.resolve(null);
+  const query = buildSearchQueryFromContext(context);
+  if(!query) return Promise.resolve(null);
+  const service = new googleLib.maps.places.PlacesService(map || document.createElement('div'));
+  return new Promise((resolve,reject)=>{
+    const request = { query, fields:['place_id','name','formatted_address','geometry','business_status'] };
+    service.findPlaceFromQuery(request, (results,status)=>{
+      if(status !== googleLib.maps.places.PlacesServiceStatus.OK || !results || !results.length){
+        reject(new Error('Place lookup failed'));
+        return;
+      }
+      const candidate = pickBestPlaceMatch(results, context);
+      if(!candidate || !candidate.place_id){
+        reject(new Error('Place ID missing'));
+        return;
+      }
+      service.getDetails({
+        placeId: candidate.place_id,
+        fields:['name','rating','user_ratings_total','reviews','editorial_summary','url','geometry','formatted_address','place_id']
+      }, (place,detailsStatus)=>{
+        if(detailsStatus !== googleLib.maps.places.PlacesServiceStatus.OK || !place){
+          reject(new Error('Place details unavailable'));
+          return;
+        }
+        const location = normalizeLatLng(place.geometry && place.geometry.location);
+        resolve({
+          placeId: place.place_id || candidate.place_id,
+          rating: typeof place.rating==='number' ? place.rating : null,
+          count: typeof place.user_ratings_total==='number' ? place.user_ratings_total : null,
+          summary: extractPlaceSummary(place),
+          url: place.url || '',
+          name: place.name || context.name || '',
+          address: place.formatted_address || context.fullAddress || '',
+          location
+        });
+      });
+    });
+  });
+}
+
+async function hydrateProfileReviews(profile, googleLib, details, map){
+  if(!profile || !googleLib) return;
+  const block = ensureReviewBlock(details);
+  const cached = profile.npi ? getCachedReview(profile.npi) : null;
+  if(cached){
+    renderReviewSummary(block, cached);
+    if(map && cached.location){
+      updateMapMarker(map, googleLib, cached.location, cached.name || profile.name);
+    }
+    return;
+  }
+  try{
+    const data = await fetchGooglePlaceDetails(googleLib, profile, map);
+    if(data){
+      storeCachedReview(profile.npi || data.placeId, data);
+      renderReviewSummary(block, data);
+      if(map && data.location){
+        updateMapMarker(map, googleLib, data.location, data.name || profile.name);
+      }
+    }else{
+      const statusEl = block && block.querySelector('.meta');
+      if(statusEl) statusEl.textContent = 'Google reviews not yet available for this clinician.';
+    }
+  }catch(err){
+    const statusEl = block && block.querySelector('.meta');
+    if(statusEl) statusEl.textContent = 'Unable to load Google reviews right now.';
+    console.warn('Google reviews failed', err);
+  }
+}
+
+async function hydrateCityRatings(cards, fallbackCity){
+  if(!Array.isArray(cards) || !cards.length) return;
+  let googleLib=null;
+  try{
+    googleLib = await loadGoogleMapsSdk();
+  }catch(err){
+    cards.forEach(card=>markCardRatingUnavailable(card));
+    console.warn('Google Maps unavailable', err);
+    return;
+  }
+  cards.forEach((card,index)=>{
+    const npi = card.dataset.npi || '';
+    const cached = npi ? getCachedReview(npi) : null;
+    if(cached){
+      applyCardRating(card, cached);
+      return;
+    }
+    const context = {
+      npi,
+      name: card.dataset.displayName || '',
+      street: card.dataset.street || '',
+      city: card.dataset.city || fallbackCity || '',
+      state: card.dataset.state || 'FL',
+      postalCode: card.dataset.postalCode || '',
+      fullAddress: card.dataset.fullAddress || '',
+      searchQuery: card.dataset.searchQuery || ''
+    };
+    const delay = index * 120;
+    setTimeout(()=>{
+      fetchGooglePlaceDetails(googleLib, context)
+        .then(details=>{
+          if(details){
+            storeCachedReview(npi || details.placeId, details);
+            applyCardRating(card, details);
+          }else{
+            markCardRatingUnavailable(card);
+          }
+        })
+        .catch(()=>markCardRatingUnavailable(card));
+    }, delay);
+  });
+}
+
+function applyCardRating(card, details){
+  if(!card) return;
+  const badge = card.querySelector('.rating-badge');
+  if(!badge) return;
+  badge.classList.remove('is-loading');
+  if(details && typeof details.rating==='number' && typeof details.count==='number'){
+    badge.innerHTML = `${details.rating.toFixed(1)} ★<small>${details.count.toLocaleString()} reviews</small>`;
+    badge.setAttribute('aria-label', `${details.rating.toFixed(1)} star rating from ${details.count.toLocaleString()} Google reviews`);
+    card.dataset.rating = details.rating.toFixed(2);
+  }else{
+    badge.innerHTML = '<small>Reviews unavailable</small>';
+    badge.setAttribute('aria-label','Google reviews unavailable');
+    card.dataset.rating = '0';
+  }
+}
+
+function markCardRatingUnavailable(card){
+  applyCardRating(card, null);
+}
+
 let leafletAssetPromise=null;
 
 function ensureLeafletAssets(){
@@ -189,53 +787,25 @@ async function sortByDistance(){
   }, ()=>{ if(status) status.textContent='Location permission denied.'; });
 }
 
+
 async function loadGoogleReviews(){
-  if(!document.body.classList.contains('podiatrist-page')) return;
-  const npi = document.body.getAttribute('data-npi');
-  if(!npi) return;
-  const contactCard = document.querySelector('h2 + .card');
-  if(!contactCard) return;
-  let reviewsBlock = contactCard.querySelector('.google-reviews');
-  if(!reviewsBlock){
-    reviewsBlock = document.createElement('div');
-    reviewsBlock.className = 'google-reviews';
-    const heading = document.createElement('strong');
-    heading.textContent = 'Google reviews';
-    const meta = document.createElement('p');
-    meta.className = 'meta';
-    meta.textContent = 'Checking Google reviews…';
-    reviewsBlock.appendChild(heading);
-    reviewsBlock.appendChild(meta);
-    contactCard.appendChild(reviewsBlock);
-  }
-  const statusEl = reviewsBlock.querySelector('.meta');
+  if(!hasDocument || !document.body.classList.contains('podiatrist-page')) return;
+  const profile = sanitizePodiatristProfile();
+  const layout = ensureContactCardLayout();
+  if(!layout || !profile) return;
+  let googleLib=null;
   try{
-    const resp = await fetch(getAssetUrl('reviews.json'),{cache:'no-store'});
-    if(!resp.ok) throw new Error('Missing reviews');
-    const data = await resp.json();
-    const match = Array.isArray(data) ? data.find(item=>String(item.npi)===String(npi)) : null;
-    if(match && typeof match.rating==='number' && typeof match.count==='number'){
-      const rating = match.rating.toFixed(1);
-      const count = match.count.toLocaleString();
-      statusEl.innerHTML = `<span class=\"rating-pill\">${rating} ★</span> ${count} Google reviews`;
-      if(match.url){
-        let link = reviewsBlock.querySelector('.review-link');
-        if(!link){
-          link = document.createElement('a');
-          link.className = 'review-link';
-          reviewsBlock.appendChild(link);
-        }
-        link.href = match.url;
-        link.target = '_blank';
-        link.rel = 'noopener';
-        link.textContent = 'Read on Google';
-      }
-    }else{
-      statusEl.textContent = 'Google reviews not yet available for this clinician.';
-    }
-  }catch(e){
-    statusEl.textContent = 'Unable to load Google reviews right now.';
+    googleLib = await loadGoogleMapsSdk();
+  }catch(err){
+    showMapStatus(layout.mapPanel, 'Provide a Google Maps API key to render this clinic map.');
+    const block = ensureReviewBlock(layout.details);
+    const statusEl = block.querySelector('.meta');
+    if(statusEl) statusEl.textContent = 'Google reviews require a valid Google Maps API key.';
+    console.warn('Google Maps unavailable', err);
+    return;
   }
+  const map = renderClinicMapForProfile(googleLib, layout.mapPanel, profile);
+  await hydrateProfileReviews(profile, googleLib, layout.details, map);
 }
 
 function initNavToggle(){
@@ -631,13 +1201,33 @@ function createDoctorCard(sourceNode, cityName, index){
   const phoneRaw = addressParts[1] ? addressParts[1].trim() : '';
   const phoneDigits = phoneRaw.replace(/[^\d]/g,'');
   const telHref = phoneDigits.length>=10 ? `tel:+1${phoneDigits.slice(-10)}` : '';
+  const parsedAddress = parseAddressComponents(address);
+  card.dataset.street = parsedAddress.street || '';
+  card.dataset.city = parsedAddress.city || cityName || '';
+  card.dataset.state = parsedAddress.state || 'FL';
+  card.dataset.postalCode = parsedAddress.postalCode || '';
+  const fullAddress = [
+    card.dataset.street,
+    card.dataset.city && card.dataset.state ? `${card.dataset.city}, ${card.dataset.state}` : card.dataset.city || card.dataset.state,
+    card.dataset.postalCode
+  ].filter(Boolean).join(' ');
+  card.dataset.fullAddress = fullAddress;
+  const npiSlug = linkEl ? extractNpiFromUrl(linkEl.getAttribute('href')) : '';
+  if(npiSlug) card.dataset.npi = npiSlug;
+  const searchContext = {
+    name: namePart,
+    street: card.dataset.street,
+    city: card.dataset.city,
+    state: card.dataset.state
+  };
+  card.dataset.searchQuery = buildSearchQueryFromContext(searchContext);
 
   card.dataset.displayName = namePart;
-  card.dataset.rating = meta.rating.toFixed(1);
+  card.dataset.rating = '0';
   card.dataset.years = String(meta.years);
   card.dataset.specialties = meta.specialties.map(item=>normalize(item)).join('|');
   card.dataset.insurance = meta.insurances.map(item=>normalize(item)).join('|');
-  const keywordSource = [displayName,address,meta.specialties.join(' '),meta.insurances.join(' ')]
+  const keywordSource = [displayName,address,card.dataset.searchQuery,meta.specialties.join(' '),meta.insurances.join(' ')]
     .filter(Boolean)
     .join(' ')
     .toLowerCase();
@@ -656,9 +1246,9 @@ function createDoctorCard(sourceNode, cityName, index){
   }
   header.appendChild(titleWrap);
   const ratingBadge = document.createElement('span');
-  ratingBadge.className = 'rating-badge';
-  ratingBadge.setAttribute('aria-label', `${meta.rating.toFixed(1)} star rating from ${meta.reviews} reviews`);
-  ratingBadge.innerHTML = `${meta.rating.toFixed(1)} ★<small>${meta.reviews} reviews</small>`;
+  ratingBadge.className = 'rating-badge is-loading';
+  ratingBadge.setAttribute('aria-live','polite');
+  ratingBadge.innerHTML = '<small>Reviews pending</small>';
   header.appendChild(ratingBadge);
   card.appendChild(header);
 
@@ -1071,6 +1661,7 @@ async function initCityDirectoryPage(){
   const insightsWidget = createInsightsWidget(insightsArticles);
   rail.appendChild(insightsWidget);
   initCityFilters(doctorGrid, totalTracked, pagination);
+  hydrateCityRatings(doctorCards, cityName);
 }
 
 const isTestEnv = typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test';

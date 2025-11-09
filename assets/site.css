@@ -176,6 +176,9 @@
   justify-content:space-between;
   gap:var(--space-3);
 }
+.rating-badge.is-loading{
+  opacity:.65;
+}
 .doctor-card h3{
   margin:0;
   font-size:1.2rem;
@@ -355,4 +358,78 @@
   width:50%;
   margin:var(--space-2) auto 0;
   text-align:center;
+}
+
+.podiatrist-page .card.contact-card{
+  display:flex;
+  flex-direction:column;
+  gap:var(--space-4);
+}
+.podiatrist-page .contact-details{
+  display:flex;
+  flex-direction:column;
+  gap:var(--space-3);
+}
+.podiatrist-page .clinic-map{
+  width:100%;
+  min-height:260px;
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  overflow:hidden;
+  position:relative;
+}
+.podiatrist-page .clinic-map-canvas{
+  position:absolute;
+  inset:0;
+}
+.podiatrist-page .clinic-map .map-status{
+  margin:0;
+  color:var(--muted);
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#f8fafc,#eef2ff);
+}
+@media(min-width:900px){
+  .podiatrist-page .card.contact-card{
+    flex-direction:row;
+    align-items:stretch;
+  }
+  .podiatrist-page .contact-details,
+  .podiatrist-page .clinic-map{
+    flex:1;
+  }
+  .podiatrist-page .clinic-map{
+    min-height:320px;
+  }
+}
+.google-reviews{
+  margin-top:var(--space-3);
+  padding-top:var(--space-3);
+  border-top:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  gap:var(--space-2);
+}
+.google-reviews strong{
+  font-size:1rem;
+}
+.google-reviews .rating-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:.35rem;
+  background:#fef9c3;
+  color:#92400e;
+  font-weight:600;
+  border-radius:999px;
+  padding:.25rem .9rem;
+}
+.google-reviews .meta,
+.google-reviews .review-summary{
+  margin:0;
+}
+.google-reviews .review-link{
+  font-weight:600;
 }
