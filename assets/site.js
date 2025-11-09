@@ -458,7 +458,7 @@ function renderReviewSummary(block, data){
     return meta;
   })();
   if(data && typeof data.rating==='number' && typeof data.count==='number'){
-    statusEl.innerHTML = `<span class="rating-pill">${data.rating.toFixed(1)} ★</span> ${data.count.toLocaleString()} Google reviews`;
+    statusEl.innerHTML = `<span class="rating-pill">${data.rating.toFixed(1)} ★</span> ${formatNumber(data.count)} Google reviews`;
   }else{
     statusEl.textContent = 'Google reviews not yet available for this clinician.';
   }
@@ -468,7 +468,11 @@ function renderReviewSummary(block, data){
     summaryEl.className = 'review-summary';
     block.appendChild(summaryEl);
   }
-  summaryEl.textContent = data && data.summary ? data.summary : 'Patients have not published a public summary yet.';
+  const totalsSummary = summarizeReviewTotals(data);
+  const textPieces = [];
+  if(totalsSummary) textPieces.push(totalsSummary);
+  if(data && data.summary) textPieces.push(data.summary);
+  summaryEl.textContent = textPieces.length ? textPieces.join('. ') : 'Patients have not published a public summary yet.';
   if(data && data.url){
     let link = block.querySelector('.review-link');
     if(!link){
@@ -488,10 +492,21 @@ function extractPlaceSummary(place){
     return place.editorial_summary.overview;
   }
   if(place && Array.isArray(place.reviews) && place.reviews.length){
-    const snippet = takeWords(place.reviews[0].text || place.reviews[0].body || '', 40);
+    const texts = place.reviews.slice(0,3).map(review=>review.text || review.body || '').filter(Boolean);
+    const snippet = takeWords(texts.join(' '), 60);
     return snippet.value || '';
   }
   return '';
+}
+
+function summarizeReviewTotals(data){
+  if(!data || typeof data.count!=='number') return '';
+  const parts = [];
+  if(typeof data.rating==='number'){
+    parts.push(`${data.rating.toFixed(1)} ★ average`);
+  }
+  parts.push(`${formatNumber(data.count)} Google reviews`);
+  return parts.join(' · ');
 }
 
 function pickBestPlaceMatch(results, context){
