@@ -889,10 +889,6 @@ function initAccordion(root){
 function createInsightsWidget(articles){
   const card = document.createElement('section');
   card.className = 'rail-widget stay-ahead-card insights-widget';
-  card.innerHTML = `
-    <p class="eyebrow">Insights</p>
-    <strong>Latest guidance from Mary Voight, DPM</strong>
-  `;
   const sorted = Array.isArray(articles) ? [...articles] : [];
   sorted.sort((a,b)=>{
     const timeA = a && a.date ? new Date(a.date).getTime() : NaN;
@@ -912,14 +908,14 @@ function createInsightsWidget(articles){
       link.href = `/podoguide/insights/${article.id}/`;
       const title = document.createElement('h4');
       title.textContent = article && article.title ? article.title : 'Read the latest insight';
-      const snippet = takeWords(article && article.excerpt ? article.excerpt : '', 25);
+      const snippet = takeWords(article && article.excerpt ? article.excerpt : '', 12);
       const excerpt = document.createElement('p');
       excerpt.textContent = snippet.value || 'Mary distills advanced foot & ankle protocols into plain language.';
       link.appendChild(title);
       link.appendChild(excerpt);
       item.appendChild(link);
       const readMore = document.createElement('a');
-      readMore.className = 'btn primary';
+      readMore.className = 'btn primary insights-read-more';
       readMore.href = `/podoguide/insights/${article.id}/`;
       readMore.textContent = 'Read more';
       readMore.setAttribute('aria-label', `Read more about ${article.title}`);
