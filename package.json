@@ -19,6 +19,9 @@
     "url": "https://github.com/rajkcho/podoguide/issues"
   },
   "homepage": "https://github.com/rajkcho/podoguide#readme",
+  "scripts": {
+    "copy-config": "node scripts/copy-config.js"
+  },
   "devDependencies": {
     "jsdom": "^24.0.0",
     "leaflet": "^1.9.4",
