@@ -775,25 +775,25 @@ function createCityHeroMedia(photoMeta, cityName){
   return { media, overlay };
 }
 
-function createCitySummaryCard(cityName, sections, maxWords=200){
+function createCitySummaryCard(cityName, sections, maxWords=150){
   if(!sections || !sections.length) return null;
-  const texts = sections
-    .map(section=>collectSectionCopy(section))
-    .filter(Boolean);
-  if(!texts.length) return null;
   const card = document.createElement('section');
   card.className = 'card city-summary-card';
   let remaining = maxWords;
-  texts.forEach(text=>{
+  const totalSections = sections.filter(Boolean).length || 1;
+  sections.forEach((section, index)=>{
     if(remaining<=0) return;
-    const { value, used } = takeWords(text, remaining);
+    const text = collectSectionCopy(section);
+    if(!text) return;
+    const limit = Math.max( Math.min(Math.floor(maxWords / totalSections), remaining), 1);
+    const { value, used } = takeWords(text, limit);
     if(!value) return;
     remaining -= used;
     const paragraph = document.createElement('p');
     paragraph.textContent = value;
     card.appendChild(paragraph);
   });
-  return card;
+  return card.childElementCount ? card : null;
 }
 
 function buildOptions(options){
