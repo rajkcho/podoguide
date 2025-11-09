@@ -269,21 +269,6 @@
   flex-direction:column;
   gap:var(--space-3);
 }
-.insights-list li,
-.rail-list li{
-  border-bottom:1px solid var(--border);
-  padding-bottom:var(--space-3);
-}
-.insights-list li:last-child,
-.rail-list li:last-child{
-  border-bottom:0;
-  padding-bottom:0;
-}
-.insights-list time{
-  display:block;
-  font-size:.85rem;
-  color:var(--muted);
-}
 .treatments-widget h3{
   margin-top:0;
 }

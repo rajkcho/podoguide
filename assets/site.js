@@ -391,6 +391,7 @@ const treatmentLinks = [
   { slug:'nail-procedures', label:'Toenail & skin procedures' }
 ];
 
+const insightsEndpoint = '/podoguide/insights/articles.json';
 const CITY_PHOTO_PREFIX = '/podoguide/img/city-photos/';
 const FALLBACK_CITY_PHOTO = '/podoguide/assets/hero-florida.jpg';
 let cityPhotoManifestCache = null;
@@ -824,6 +825,58 @@ function initAccordion(root){
   });
 }
 
+function createInsightsWidget(){
+  const card = document.createElement('section');
+  card.className = 'rail-widget insights-widget';
+  const heading = document.createElement('div');
+  heading.className = 'rail-heading';
+  heading.innerHTML = '<p class="eyebrow">Latest insights</p><h3>Stay ahead of foot & ankle care</h3>';
+  const list = document.createElement('ol');
+  list.className = 'insights-list';
+  list.id = 'city-insights-list';
+  const loading = document.createElement('li');
+  loading.className = 'meta';
+  loading.textContent = 'Loading insights…';
+  list.appendChild(loading);
+  card.appendChild(heading);
+  card.appendChild(list);
+  return card;
+}
+
+async function hydrateInsightsList(){
+  const list = document.getElementById('city-insights-list');
+  if(!list) return;
+  try{
+    const resp = await fetch(insightsEndpoint, {cache:'no-cache'});
+    if(!resp.ok) throw new Error('Unable to load insights');
+    const articles = await resp.json();
+    const subset = Array.isArray(articles) ? articles.slice(0,3) : [];
+    if(!subset.length){
+      list.innerHTML = '<li class="meta">Insights will appear here soon.</li>';
+      return;
+    }
+    list.innerHTML = '';
+    subset.forEach(article=>{
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = `/podoguide/insights/${article.id}/`;
+      link.textContent = article.title;
+      const dateObj = new Date(article.date);
+      const dateLabel = !isNaN(dateObj.getTime())
+        ? dateObj.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})
+        : article.date;
+      const meta = document.createElement('p');
+      meta.className = 'meta';
+      meta.textContent = `${dateLabel} • ${article.readTime || 3} min read`;
+      item.appendChild(link);
+      item.appendChild(meta);
+      list.appendChild(item);
+    });
+  }catch(err){
+    list.innerHTML = '<li class="meta">We couldn’t load the insights feed.</li>';
+  }
+}
+
 function createTreatmentsWidget(cityName){
   const card = document.createElement('section');
   card.className = 'rail-widget treatments-widget';
@@ -863,14 +916,7 @@ function createCtaWidget(cityName){
 
 function transformAdSlot(adSlot){
   if(!adSlot) return null;
-  adSlot.classList.remove('ad');
-  adSlot.classList.add('rail-widget','stay-ahead-card');
-  adSlot.innerHTML = `
-    <p class="eyebrow">Insights</p>
-    <strong>Stay ahead of foot &amp; ankle care</strong>
-    <p class="meta">Mary Voight, DPM shares clinical takeaways on recovery, footwear, and prevention.</p>
-    <a class="btn secondary" href="/podoguide/insights/">Browse insights</a>
-  `;
+  adSlot.classList.add('rail-widget');
   return adSlot;
 }
 
@@ -993,6 +1039,8 @@ async function initCityDirectoryPage(){
   doctorCards.forEach(card=>doctorGrid.appendChild(card));
   mainCol.appendChild(doctorGrid);
   if(pagination) mainCol.appendChild(pagination);
+  const insightsWidget = createInsightsWidget();
+  rail.appendChild(insightsWidget);
   if(adSlot){
     const preparedAd = transformAdSlot(adSlot);
     if(preparedAd) rail.appendChild(preparedAd);
@@ -1000,6 +1048,7 @@ async function initCityDirectoryPage(){
   rail.appendChild(createTreatmentsWidget(cityName));
   rail.appendChild(createCtaWidget(cityName));
   initCityFilters(doctorGrid, totalTracked);
+  hydrateInsightsList();
 }
 
 const isTestEnv = typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test';
