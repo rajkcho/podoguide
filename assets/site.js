@@ -468,11 +468,8 @@ function renderReviewSummary(block, data){
     summaryEl.className = 'review-summary';
     block.appendChild(summaryEl);
   }
-  const totalsSummary = summarizeReviewTotals(data);
-  const textPieces = [];
-  if(totalsSummary) textPieces.push(totalsSummary);
-  if(data && data.summary) textPieces.push(data.summary);
-  summaryEl.textContent = textPieces.length ? textPieces.join('. ') : 'Patients have not published a public summary yet.';
+  const reviewSummaryText = (data && data.summary) ? data.summary : summarizeReviewTotals(data);
+  summaryEl.textContent = reviewSummaryText ? reviewSummaryText : 'Patients have not published a public summary yet.';
   if(data && data.url){
     let link = block.querySelector('.review-link');
     if(!link){
