@@ -278,6 +278,12 @@ function sanitizePodiatristProfile(){
       anchor.href = sanitizedMapHref;
     });
   }
+  document.querySelectorAll('.meta').forEach(el=>{
+    const text = (el.textContent||'').trim();
+    if(/^NPI:/i.test(text)){
+      el.remove();
+    }
+  });
   const { node:ldNode, data:ldData } = parseJsonLd();
   if(ldData){
     if(cleanName) ldData.name = cleanName;
