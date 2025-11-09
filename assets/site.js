@@ -775,7 +775,7 @@ function createCityHeroMedia(photoMeta, cityName){
   return { media, overlay };
 }
 
-function createCitySummaryCard(cityName, sections, maxWords=400){
+function createCitySummaryCard(cityName, sections, maxWords=200){
   if(!sections || !sections.length) return null;
   const texts = sections
     .map(section=>collectSectionCopy(section))
@@ -886,17 +886,6 @@ function initAccordion(root){
   });
 }
 
-function formatInsightMeta(article){
-  const details = ['Mary Voight, DPM'];
-  if(article && article.date){
-    const date = new Date(article.date);
-    if(!isNaN(date.getTime())){
-      details.push(date.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}));
-    }
-  }
-  return details.join(' · ');
-}
-
 function createInsightsWidget(articles){
   const card = document.createElement('section');
   card.className = 'rail-widget stay-ahead-card insights-widget';
@@ -923,18 +912,14 @@ function createInsightsWidget(articles){
       link.href = `/podoguide/insights/${article.id}/`;
       const title = document.createElement('h4');
       title.textContent = article && article.title ? article.title : 'Read the latest insight';
-      const meta = document.createElement('p');
-      meta.className = 'meta';
-      meta.textContent = formatInsightMeta(article);
-      const snippet = takeWords(article && article.excerpt ? article.excerpt : '', 40);
+      const snippet = takeWords(article && article.excerpt ? article.excerpt : '', 25);
       const excerpt = document.createElement('p');
       excerpt.textContent = snippet.value || 'Mary distills advanced foot & ankle protocols into plain language.';
       link.appendChild(title);
-      link.appendChild(meta);
       link.appendChild(excerpt);
       item.appendChild(link);
       const readMore = document.createElement('a');
-      readMore.className = 'btn ghost insights-read-more';
+      readMore.className = 'btn primary';
       readMore.href = `/podoguide/insights/${article.id}/`;
       readMore.textContent = 'Read more';
       readMore.setAttribute('aria-label', `Read more about ${article.title}`);
