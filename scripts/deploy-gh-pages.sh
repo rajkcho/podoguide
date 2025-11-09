@@ -3,6 +3,7 @@ set -euo pipefail
 
 BUILD_DIR=${1:-"."}
 BRANCH=${2:-"gh-pages"}
+projectRoot=$(git rev-parse --show-toplevel)
 
 ABS_BUILD_DIR=$(cd "$BUILD_DIR" && pwd)
 ASSETS_DIR="$ABS_BUILD_DIR/assets"
