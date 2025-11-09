@@ -958,7 +958,7 @@ function initCityFilters(grid, totalTracked, pagination){
       return parseInt(a.dataset.order||'0',10)-parseInt(b.dataset.order||'0',10);
     }
   };
-    const apply = ()=>{
+  const apply = ()=>{
     const keyword = normalize(search && search.value);
     const specialtyValue = normalize(specialty && specialty.value);
     const insuranceValue = normalize(insurance && insurance.value);
@@ -986,13 +986,13 @@ function initCityFilters(grid, totalTracked, pagination){
     if(pagination){
       pagination.hidden = visibleCount < allCardsCount;
     }
-    };
-    applyCityFilters = apply;
+  };
+  applyCityFilters = apply;
   if(search) search.addEventListener('input', apply);
   if(specialty) specialty.addEventListener('change', apply);
   if(insurance) insurance.addEventListener('change', apply);
-    if(sort) sort.addEventListener('change', apply);
-    apply();
+  if(sort) sort.addEventListener('change', apply);
+  apply();
 }
 
 async function initCityDirectoryPage(){
