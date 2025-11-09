@@ -20,7 +20,8 @@
   },
   "homepage": "https://github.com/rajkcho/podoguide#readme",
   "scripts": {
-    "copy-config": "node scripts/copy-config.js"
+    "copy-config": "node scripts/copy-config.js",
+    "deploy:gh-pages": "bash scripts/deploy-gh-pages.sh . gh-pages"
   },
   "devDependencies": {
     "jsdom": "^24.0.0",
