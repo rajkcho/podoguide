@@ -783,9 +783,6 @@ function createCitySummaryCard(cityName, sections, maxWords=400){
   if(!texts.length) return null;
   const card = document.createElement('section');
   card.className = 'card city-summary-card';
-  const heading = document.createElement('h2');
-  heading.textContent = `${cityName} podiatry snapshot`;
-  card.appendChild(heading);
   let remaining = maxWords;
   texts.forEach(text=>{
     if(remaining<=0) return;
@@ -897,9 +894,6 @@ function formatInsightMeta(article){
       details.push(date.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}));
     }
   }
-  if(article && article.readTime){
-    details.push(`${article.readTime} min read`);
-  }
   return details.join(' · ');
 }
 
@@ -939,6 +933,12 @@ function createInsightsWidget(articles){
       link.appendChild(meta);
       link.appendChild(excerpt);
       item.appendChild(link);
+      const readMore = document.createElement('a');
+      readMore.className = 'btn ghost insights-read-more';
+      readMore.href = `/podoguide/insights/${article.id}/`;
+      readMore.textContent = 'Read more';
+      readMore.setAttribute('aria-label', `Read more about ${article.title}`);
+      item.appendChild(readMore);
       list.appendChild(item);
     });
     card.appendChild(list);

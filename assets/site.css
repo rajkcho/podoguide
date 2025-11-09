@@ -336,3 +336,9 @@
 .insights-widget .btn{
   align-self:flex-start;
 }
+.insights-read-more{
+  margin-top:var(--space-2);
+  text-transform:uppercase;
+  font-size:.8rem;
+  padding:var(--space-1) var(--space-3);
+}
