@@ -94,6 +94,19 @@
   color:inherit;
   text-decoration:underline;
 }
+.city-summary-card{
+  padding:var(--space-5);
+  display:flex;
+  flex-direction:column;
+  gap:var(--space-3);
+}
+.city-summary-card h2{
+  margin:0;
+}
+.city-summary-card p{
+  margin:0;
+  color:var(--muted);
+}
 .hero-cta .btn{
   width:100%;
 }
@@ -276,15 +289,6 @@
   flex-direction:column;
   gap:var(--space-3);
 }
-.treatments-widget h3{
-  margin-top:0;
-}
-.rail-cta{
-  text-align:center;
-}
-.rail-cta p{
-  margin-bottom:var(--space-3);
-}
 .stay-ahead-card{
   display:flex;
   flex-direction:column;
@@ -292,4 +296,43 @@
 }
 .stay-ahead-card strong{
   font-size:1.05rem;
+}
+.insights-widget{
+  gap:var(--space-4);
+}
+.insights-widget-list{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:var(--space-3);
+}
+.insights-widget-list li{
+  border-top:1px solid var(--border);
+  padding-top:var(--space-3);
+}
+.insights-widget-list li:first-child{
+  border-top:0;
+  padding-top:0;
+}
+.insights-widget-list a{
+  display:block;
+  text-decoration:none;
+  color:inherit;
+}
+.insights-widget-list h4{
+  margin:0 0 var(--space-1);
+  font-size:1rem;
+}
+.insights-widget-list p{
+  margin:0;
+}
+.insights-widget-list .meta{
+  font-size:.85rem;
+  color:var(--muted);
+  margin-bottom:var(--space-2);
+}
+.insights-widget .btn{
+  align-self:flex-start;
 }

@@ -384,17 +384,13 @@ const insuranceFilters = [
   { value:'tricare', label:'Tricare' }
 ];
 
-const treatmentLinks = [
-  { slug:'custom-orthotics', label:'Custom orthotics' },
-  { slug:'shockwave-therapy', label:'Shockwave therapy' },
-  { slug:'foot-surgery', label:'Foot & ankle surgery' },
-  { slug:'nail-procedures', label:'Toenail & skin procedures' }
-];
-
 const CITY_PHOTO_PREFIX = '/podoguide/img/city-photos/';
 const FALLBACK_CITY_PHOTO = '/podoguide/assets/hero-florida.jpg';
+const INSIGHTS_SUMMARY_URL = '/podoguide/insights/articles.json';
 let cityPhotoManifestCache = null;
 let cityPhotoManifestPromise = null;
+let insightsSummaryCache = null;
+let insightsSummaryPromise = null;
 
 function loadCityPhotoManifest(){
   if(cityPhotoManifestCache) return Promise.resolve(cityPhotoManifestCache);
@@ -421,6 +417,31 @@ function loadCityPhotoManifest(){
       return cityPhotoManifestCache;
     });
   return cityPhotoManifestPromise;
+}
+
+function loadInsightsSummaries(){
+  if(insightsSummaryCache) return Promise.resolve(insightsSummaryCache);
+  if(insightsSummaryPromise) return insightsSummaryPromise;
+  if(!hasDocument || typeof fetch === 'undefined'){
+    insightsSummaryCache = [];
+    return Promise.resolve(insightsSummaryCache);
+  }
+  insightsSummaryPromise = fetch(INSIGHTS_SUMMARY_URL, {cache:'no-cache'})
+    .then(resp=>resp && resp.ok ? resp.json() : [])
+    .then(entries=>{
+      if(!Array.isArray(entries)){
+        insightsSummaryCache = [];
+        return insightsSummaryCache;
+      }
+      insightsSummaryCache = entries;
+      return entries;
+    })
+    .catch(err=>{
+      console.warn('Insight summaries failed to load', err);
+      insightsSummaryCache = [];
+      return insightsSummaryCache;
+    });
+  return insightsSummaryPromise;
 }
 
 function getCitySlugFromPath(){
@@ -451,6 +472,18 @@ function getCityPhotoUrl(fileName){
 function formatNumber(value){
   if(typeof value!=='number' || isNaN(value)) return '';
   return value.toLocaleString();
+}
+
+function takeWords(text, limit, appendEllipsis=true){
+  if(!text || limit<=0) return { value:'', used:0 };
+  const normalized = text.replace(/\s+/g,' ').trim();
+  if(!normalized) return { value:'', used:0 };
+  const words = normalized.split(' ');
+  if(words.length<=limit){
+    return { value: normalized, used: words.length };
+  }
+  const slice = words.slice(0, limit).join(' ');
+  return { value: appendEllipsis ? `${slice}…` : slice, used: limit };
 }
 
 function parseCityStats(copy){
@@ -502,6 +535,16 @@ function extractSection(container, matcher){
   return null;
 }
 
+function collectSectionCopy(section){
+  if(!section || !section.content) return '';
+  const root = section.content;
+  const paragraphs = root.querySelectorAll ? Array.from(root.querySelectorAll('p')) : [];
+  if(paragraphs.length){
+    return paragraphs.map(p=>(p.textContent||'').trim()).filter(Boolean).join(' ');
+  }
+  return (root.textContent || '').trim();
+}
+
 function getUpdatedCopy(){
   const footer = document.querySelector('.footer');
   if(footer){
@@ -550,9 +593,7 @@ function buildDoctorMeta(name, cityName){
   const specialties = pickFromPool(specialtyFilters.slice(1).map(opt=>opt.label), hash, 2);
   const insurances = pickFromPool(insuranceFilters.slice(1).map(opt=>opt.label), hash>>2, 2);
   const cleanName = name.replace(/^Dr\.?\s*/i,'').trim();
-  const lastName = cleanName.split(' ').pop() || cleanName || 'the team';
-  const bio = `Dr. ${lastName} guides ${cityName} patients through ${specialties[0].toLowerCase()} and ${specialties[1].toLowerCase()} plans.`;
-  return { rating, reviews, years, specialties, insurances, bio };
+  return { rating, reviews, years, specialties, insurances, cleanName };
 }
 
 function copyDataAttributes(source, target){
@@ -596,7 +637,7 @@ function createDoctorCard(sourceNode, cityName, index){
   card.dataset.years = String(meta.years);
   card.dataset.specialties = meta.specialties.map(item=>normalize(item)).join('|');
   card.dataset.insurance = meta.insurances.map(item=>normalize(item)).join('|');
-  const keywordSource = [displayName,address,meta.bio,meta.specialties.join(' '),meta.insurances.join(' ')]
+  const keywordSource = [displayName,address,meta.specialties.join(' '),meta.insurances.join(' ')]
     .filter(Boolean)
     .join(' ')
     .toLowerCase();
@@ -623,21 +664,21 @@ function createDoctorCard(sourceNode, cityName, index){
 
   const metaLine = document.createElement('p');
   metaLine.className = 'doctor-meta';
-  const metaBits = [`${meta.years} yrs in practice`];
+  const metaBits = [];
   if(address) metaBits.push(address);
-  metaLine.textContent = metaBits.join(' • ');
-  card.appendChild(metaLine);
+  if(meta.specialties.length){
+    metaBits.push(meta.specialties.join(' • '));
+  }
+  if(metaBits.length){
+    metaLine.textContent = metaBits.join(' • ');
+    card.appendChild(metaLine);
+  }
 
   const distancePill = document.createElement('div');
   distancePill.className = 'distance-pill';
   distancePill.setAttribute('data-dist-badge','');
   distancePill.setAttribute('aria-live','polite');
   card.appendChild(distancePill);
-
-  const bio = document.createElement('p');
-  bio.className = 'doctor-bio';
-  bio.textContent = meta.bio;
-  card.appendChild(bio);
 
   const badges = document.createElement('ul');
   badges.className = 'doctor-badges';
@@ -734,6 +775,30 @@ function createCityHeroMedia(photoMeta, cityName){
   return { media, overlay };
 }
 
+function createCitySummaryCard(cityName, sections, maxWords=400){
+  if(!sections || !sections.length) return null;
+  const texts = sections
+    .map(section=>collectSectionCopy(section))
+    .filter(Boolean);
+  if(!texts.length) return null;
+  const card = document.createElement('section');
+  card.className = 'card city-summary-card';
+  const heading = document.createElement('h2');
+  heading.textContent = `${cityName} podiatry snapshot`;
+  card.appendChild(heading);
+  let remaining = maxWords;
+  texts.forEach(text=>{
+    if(remaining<=0) return;
+    const { value, used } = takeWords(text, remaining);
+    if(!value) return;
+    remaining -= used;
+    const paragraph = document.createElement('p');
+    paragraph.textContent = value;
+    card.appendChild(paragraph);
+  });
+  return card;
+}
+
 function buildOptions(options){
   return options.map(option=>`<option value="${option.value}">${option.label}</option>`).join('');
 }
@@ -824,52 +889,70 @@ function initAccordion(root){
   });
 }
 
-function createTreatmentsWidget(cityName){
-  const card = document.createElement('section');
-  card.className = 'rail-widget treatments-widget';
-  const heading = document.createElement('h3');
-  heading.textContent = `Top treatments in ${cityName}`;
-  card.appendChild(heading);
-  const list = document.createElement('ol');
-  list.className = 'rail-list';
-  treatmentLinks.forEach(link=>{
-    const item = document.createElement('li');
-    const anchor = document.createElement('a');
-    anchor.href = `/podoguide/treatments/${link.slug}/`;
-    anchor.textContent = link.label;
-    item.appendChild(anchor);
-    list.appendChild(item);
-  });
-  card.appendChild(list);
-  return card;
+function formatInsightMeta(article){
+  const details = ['Mary Voight, DPM'];
+  if(article && article.date){
+    const date = new Date(article.date);
+    if(!isNaN(date.getTime())){
+      details.push(date.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}));
+    }
+  }
+  if(article && article.readTime){
+    details.push(`${article.readTime} min read`);
+  }
+  return details.join(' · ');
 }
 
-function createCtaWidget(cityName){
+function createInsightsWidget(articles){
   const card = document.createElement('section');
-  card.className = 'rail-widget rail-cta';
-  const heading = document.createElement('h3');
-  heading.textContent = 'Need help choosing?';
-  const copy = document.createElement('p');
-  copy.textContent = `Tell us about your ${cityName} goals and we’ll match you with a podiatrist.`;
-  const btn = document.createElement('a');
-  btn.className = 'btn primary';
-  btn.href = '/podoguide/contact/';
-  btn.textContent = 'Talk with a guide';
-  card.appendChild(heading);
-  card.appendChild(copy);
-  card.appendChild(btn);
-  return card;
-}
-
-function createStayAheadCard(){
-  const card = document.createElement('section');
-  card.className = 'rail-widget stay-ahead-card';
+  card.className = 'rail-widget stay-ahead-card insights-widget';
   card.innerHTML = `
     <p class="eyebrow">Insights</p>
-    <strong>Stay ahead of foot &amp; ankle care</strong>
-    <p class="meta">Mary Voight, DPM shares recovery tips, footwear audits, and prevention checklists every week.</p>
-    <a class="btn secondary" href="/podoguide/insights/">Browse insights</a>
+    <strong>Latest guidance from Mary Voight, DPM</strong>
   `;
+  const sorted = Array.isArray(articles) ? [...articles] : [];
+  sorted.sort((a,b)=>{
+    const timeA = a && a.date ? new Date(a.date).getTime() : NaN;
+    const timeB = b && b.date ? new Date(b.date).getTime() : NaN;
+    if(isNaN(timeA) && isNaN(timeB)) return 0;
+    if(isNaN(timeA)) return 1;
+    if(isNaN(timeB)) return -1;
+    return timeB - timeA;
+  });
+  const subset = sorted.slice(0,3);
+  if(subset.length){
+    const list = document.createElement('ul');
+    list.className = 'insights-widget-list';
+    subset.forEach(article=>{
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = `/podoguide/insights/${article.id}/`;
+      const title = document.createElement('h4');
+      title.textContent = article && article.title ? article.title : 'Read the latest insight';
+      const meta = document.createElement('p');
+      meta.className = 'meta';
+      meta.textContent = formatInsightMeta(article);
+      const snippet = takeWords(article && article.excerpt ? article.excerpt : '', 40);
+      const excerpt = document.createElement('p');
+      excerpt.textContent = snippet.value || 'Mary distills advanced foot & ankle protocols into plain language.';
+      link.appendChild(title);
+      link.appendChild(meta);
+      link.appendChild(excerpt);
+      item.appendChild(link);
+      list.appendChild(item);
+    });
+    card.appendChild(list);
+  }else{
+    const empty = document.createElement('p');
+    empty.className = 'meta';
+    empty.textContent = 'Mary shares weekly recovery and prevention playbooks. Fresh articles are on the way.';
+    card.appendChild(empty);
+  }
+  const browse = document.createElement('a');
+  browse.className = 'btn secondary';
+  browse.href = '/podoguide/insights/';
+  browse.textContent = 'Browse all insights';
+  card.appendChild(browse);
   return card;
 }
 
@@ -945,8 +1028,8 @@ async function initCityDirectoryPage(){
   if(headingEl) headingEl.remove();
   if(cityCountEl) cityCountEl.remove();
   extractSection(container, /About podiatry/i);
-  extractSection(container, /Common conditions/i);
-  extractSection(container, /Common treatments/i);
+  const conditionsSection = extractSection(container, /Common conditions/i);
+  const treatmentsSection = extractSection(container, /Common treatments/i);
   const directoryHeading = extractHeading(container, /podiatrist directory/i) || `${cityName} podiatrist directory`;
   const pagination = container.querySelector('.pagination');
   if(pagination) pagination.remove();
@@ -969,14 +1052,22 @@ async function initCityDirectoryPage(){
   container.appendChild(layout);
   const totalTracked = stats.total || doctorCards.length;
   let cityPhoto = null;
+  let insightsArticles = [];
   try{
-    const manifest = await loadCityPhotoManifest();
-    cityPhoto = manifest[citySlug] || null;
+    const [manifest, insights] = await Promise.all([
+      loadCityPhotoManifest(),
+      loadInsightsSummaries()
+    ]);
+    cityPhoto = manifest && manifest[citySlug] || null;
+    insightsArticles = Array.isArray(insights) ? insights : [];
   }catch(err){
     cityPhoto = null;
+    insightsArticles = [];
   }
   mainCol.appendChild(createHeroCard(headingText || `Podiatrists in ${cityName}, FL`, totalTracked, stats.pageCopy, updatedCopy, cityName, cityPhoto));
   mainCol.appendChild(createFilterBar(doctorCards.length, totalTracked));
+  const summaryCard = createCitySummaryCard(cityName, [conditionsSection, treatmentsSection]);
+  if(summaryCard) mainCol.appendChild(summaryCard);
   const listHeading = document.createElement('h2');
   listHeading.textContent = directoryHeading;
   mainCol.appendChild(listHeading);
@@ -986,9 +1077,8 @@ async function initCityDirectoryPage(){
   doctorCards.forEach(card=>doctorGrid.appendChild(card));
   mainCol.appendChild(doctorGrid);
   if(pagination) mainCol.appendChild(pagination);
-  rail.appendChild(createStayAheadCard());
-  rail.appendChild(createTreatmentsWidget(cityName));
-  rail.appendChild(createCtaWidget(cityName));
+  const insightsWidget = createInsightsWidget(insightsArticles);
+  rail.appendChild(insightsWidget);
   initCityFilters(doctorGrid, totalTracked);
 }
 
